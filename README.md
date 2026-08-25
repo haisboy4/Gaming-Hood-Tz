@@ -1,21 +1,17 @@
 # Gaming Hood V2
 
-First foundation for the new independent Gaming Hood website.
+Independent Gaming Hood gaming website.
 
-## Current files
+## Publishing games
 
-- `index.html` — homepage
-- `css/style.css` — responsive UI
-- `js/app.js` — navigation, search, game rendering, random game, PWA registration
-- `data/games.json` — temporary sample database
-- `manifest.json` — PWA metadata
-- `service-worker.js` — offline/app-shell caching
+The site uses a CMS-ready workflow:
 
-## Next stage
+- `admin/` — Decap CMS publishing interface
+- `data/games/` — one JSON file per game
+- `data/games.json` — generated index used by the frontend
+- `scripts/build-game-index.py` — combines individual game files
+- `.github/workflows/deploy.yml` — rebuilds the index and deploys GitHub Pages
 
-1. Replace the sample `games.json` with the real Gaming Hood database.
-2. Build `game.html`.
-3. Build category/search pages.
-4. Add sharing.
-5. Add compatibility checker.
-6. Add emulator pages, FAQ and request functionality.
+**Admin → New Game → Publish → GitHub commit → automatic index build → GitHub Pages deployment.**
+
+Authentication must be configured for the Decap GitHub backend before publishing. Never put a GitHub personal access token in client-side code.
