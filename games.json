@@ -1,0 +1,25 @@
+{
+  "games": [
+    {
+      "genre": [
+        "Fighting "
+      ],
+      "offline": true,
+      "emulator_link": "https://play.google.com/store/apps/details?id=org.ppsspp.ppsspp",
+      "slug": "ufc-5",
+      "controller_support": true,
+      "build": "V0.1",
+      "download_link": "https://www.mediafire.com/file/qfu54rchww9tvcl/UFC5PPSSPP+BY+MODXDROID.COM.zip/file?dkey=0vvpxwkt8zg&r=85",
+      "vulkan_required": false,
+      "platform": "PSP",
+      "release_year": 2025,
+      "emulator": "PPSSPP emulator ",
+      "title": "UFC 5",
+      "tags": [
+        "PSP "
+      ],
+      "image": "https://i.postimg.cc/Qd69r02D/IMG-20260214-204548-010.jpg",
+      "description": "UFC 5 PSP mod featuring updated fighters, enhanced graphics, new arenas, and improved gameplay for an upgraded MMA experience on PPSSPP."
+    }
+  ]
+}
