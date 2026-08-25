@@ -1,175 +1,25 @@
 {
   "games": [
     {
-      "added": "2026-08-25",
-      "size": "PC",
-      "releaseYear": 2024,
-      "download": "",
-      "views": 22275,
-      "build": "Build 21621978",
-      "requirements": {
-        "minRam": 4,
-        "recommendedRam": 8,
-        "gpu": "Dedicated GPU recommended"
-      },
-      "platform": "PC",
-      "emulator": "",
-      "title": "Hollowbody",
-      "tags": [
-        "Horror",
-        "Adventure",
-        "Indie"
-      ],
-      "id": "hollowbody",
-      "image": "",
-      "description": "A survival horror game set in a decaying exclusion zone.",
-      "features": {
-        "offline": true,
-        "controller": true,
-        "multiplayer": false
-      }
-    },
-    {
-      "added": "2026-08-24",
-      "size": "PC",
-      "releaseYear": 2026,
-      "download": "",
-      "views": 18200,
-      "build": "Build 20906491",
-      "requirements": {
-        "minRam": 4,
-        "recommendedRam": 8,
-        "gpu": "Modern GPU"
-      },
-      "platform": "PC",
-      "emulator": "",
-      "title": "Raven's Story",
-      "tags": [
-        "Adventure",
-        "Indie"
-      ],
-      "id": "ravens-story",
-      "image": "",
-      "description": "An indie adventure featuring a mysterious raven and a strange world.",
-      "features": {
-        "offline": true,
-        "controller": true,
-        "multiplayer": false
-      }
-    },
-    {
-      "added": "2026-08-23",
-      "size": "PC",
-      "releaseYear": 2026,
-      "download": "",
-      "views": 15400,
-      "build": "Build 24706823",
-      "requirements": {
-        "minRam": 4,
-        "recommendedRam": 8,
-        "gpu": "Modern GPU"
-      },
-      "platform": "PC",
-      "emulator": "",
-      "title": "Undead West",
-      "tags": [
-        "Action",
-        "Indie"
-      ],
-      "id": "undead-west",
-      "image": "",
-      "description": "A stylized western adventure with undead enemies.",
-      "features": {
-        "offline": true,
-        "controller": true,
-        "multiplayer": false
-      }
-    },
-    {
-      "added": "2026-08-22",
-      "size": "PC",
-      "releaseYear": 2026,
-      "download": "",
-      "views": 12100,
-      "build": "Build 18961968",
-      "requirements": {
-        "minRam": 4,
-        "recommendedRam": 8,
-        "gpu": "Modern GPU"
-      },
-      "platform": "PC",
-      "emulator": "",
-      "title": "9 Keys",
-      "tags": [
-        "Adventure",
-        "Indie"
-      ],
-      "id": "9-keys",
-      "image": "",
-      "description": "An atmospheric adventure with exploration and mystery.",
-      "features": {
-        "offline": true,
-        "controller": true,
-        "multiplayer": false
-      }
-    },
-    {
-      "added": "2026-08-20",
-      "size": "8.2 GB",
+      "size": "6 GB ",
       "releaseYear": 2010,
       "download": "https://www.mediafire.com/file/f9w84e2k47btwc3/Call+Of+Duty+Black+Ops+1+Optimized.7z/file",
-      "views": 9800,
-      "build": "",
+      "views": 0,
       "requirements": {
+        "vulkan": true,
         "minRam": 4,
-        "recommendedRam": 6,
-        "gpu": "Adreno 630 / equivalent",
-        "android": "9+",
-        "vulkan": true
+        "recommendedRam": 6
       },
       "platform": "PC",
-      "emulator": "Winlator",
-      "title": "Call of Duty: Black Ops",
-      "tags": [
-        "Shooter",
-        "Action",
-        "Winlator"
-      ],
-      "id": "call-of-duty-black-ops",
+      "emulator": "Winlator ",
+      "title": "Call of duty: black ops ",
+      "id": "cod-black-ops",
       "image": "https://i.postimg.cc/Fz6Vyj6g/Co-D-Black-Ops-cover.png",
-      "description": "Tactical shooting game ",
+      "description": "Call of Duty: Black Ops is a popular first-person shooter franchise focused on covert military operations, espionage, and cold-war style conflicts. It features fast-paced multiplayer, intense cinematic story campaigns, and a widely acclaimed round-based Zombies game mode.",
       "features": {
         "offline": true,
         "controller": true,
         "multiplayer": true
-      }
-    },
-    {
-      "added": "2026-08-18",
-      "size": "2.4 GB",
-      "releaseYear": 2026,
-      "download": "",
-      "views": 7600,
-      "build": "",
-      "requirements": {
-        "minRam": 3,
-        "recommendedRam": 4,
-        "gpu": "Adreno 5xx / Mali equivalent",
-        "android": "8+"
-      },
-      "platform": "PC",
-      "emulator": "",
-      "title": "Call of duty black ops ",
-      "tags": [
-        "Android"
-      ],
-      "id": "call-of-duty",
-      "image": "",
-      "description": "Example database record. Replace this with your actual game.",
-      "features": {
-        "offline": true,
-        "controller": false,
-        "multiplayer": false
       }
     }
   ]
