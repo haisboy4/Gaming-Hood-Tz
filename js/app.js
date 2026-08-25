@@ -3,7 +3,12 @@ const state = {
   filtered: []
 };
 
-const $ = (selector) => document.querySelector(selector);
+const $ = selector => document.querySelector(selector);
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
 
 function escapeHTML(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -15,8 +20,14 @@ function escapeHTML(value = "") {
   }[char]));
 }
 
+
+/* =========================================================
+   TOAST
+========================================================= */
+
 function showToast(message) {
   const toast = $("#toast");
+
   if (!toast) return;
 
   toast.textContent = message;
@@ -29,33 +40,189 @@ function showToast(message) {
   }, 2200);
 }
 
+
+/* =========================================================
+   LOADING SKELETON
+========================================================= */
+
 function skeletons(target, count = 4) {
   if (!target) return;
 
-  target.innerHTML = Array.from({ length: count }, () => `
-    <article class="game-card">
-      <div class="skeleton skeleton-cover"></div>
-      <div class="skeleton skeleton-info"></div>
-    </article>
-  `).join("");
+  target.innerHTML = Array.from(
+    { length: count },
+    () => `
+      <article class="game-card">
+        <div class="skeleton skeleton-cover"></div>
+        <div class="skeleton skeleton-info"></div>
+      </article>
+    `
+  ).join("");
 }
 
+
+/* =========================================================
+   NORMALIZE DECАP DATABASE
+========================================================= */
+
+function normalizeGames(data) {
+
+  return data.map((game, index) => {
+
+    /*
+     * Decap CMS uses snake_case.
+     * This function converts everything into one
+     * consistent format for the website.
+     */
+
+    const genre = Array.isArray(game.genre)
+      ? game.genre.filter(Boolean)
+      : [];
+
+    const tags = Array.isArray(game.tags)
+      ? game.tags.filter(Boolean)
+      : [];
+
+    /*
+     * Combine genre + tags for searching.
+     */
+
+    const allTags = [
+      ...genre,
+      ...tags
+    ]
+      .map(value => String(value).trim())
+      .filter(Boolean);
+
+
+    return {
+
+      id: game.id || game.slug || `game-${index + 1}`,
+
+      title: game.title || "Untitled Game",
+
+      slug: game.slug || game.id || "",
+
+      platform: game.platform || "Other",
+
+      emulator: game.emulator || "",
+
+      genre,
+
+      tags,
+
+      allTags,
+
+      image: game.image || "",
+
+      description: game.description || "",
+
+      size: game.size_gb || game.size || "",
+
+      build: game.build || "",
+
+      releaseYear:
+        game.release_year ||
+        game.releaseYear ||
+        "",
+
+      minRam:
+        game.min_ram ||
+        "",
+
+      recommendedRam:
+        game.recommended_ram ||
+        "",
+
+      gpu:
+        game.gpu ||
+        "",
+
+      android:
+        game.android_support ||
+        "",
+
+      offline:
+        typeof game.offline === "boolean"
+          ? game.offline
+          : null,
+
+      controller:
+        typeof game.controller_support === "boolean"
+          ? game.controller_support
+          : null,
+
+      multiplayer:
+        typeof game.multiplayer === "boolean"
+          ? game.multiplayer
+          : null,
+
+      vulkan:
+        typeof game.vulkan_required === "boolean"
+          ? game.vulkan_required
+          : null,
+
+      fpsLow: game.fps_low || "",
+
+      fpsMid: game.fps_mid || "",
+
+      fpsHigh: game.fps_high || "",
+
+      download:
+        game.download_link ||
+        game.download ||
+        "",
+
+      emulatorLink:
+        game.emulator_link ||
+        "",
+
+      views:
+        Number(game.views || 0),
+
+      added:
+        game.added || new Date().toISOString()
+
+    };
+
+  });
+
+}
+
+
+/* =========================================================
+   GAME CARD
+========================================================= */
+
 function gameCard(game) {
+
   const title = escapeHTML(game.title);
-  const platform = escapeHTML(game.platform || "Game");
-  const emulator = game.emulator
-    ? escapeHTML(game.emulator)
-    : "";
 
-  const build = game.build
-    ? escapeHTML(game.build)
-    : "";
+  const platform =
+    escapeHTML(game.platform || "Game");
 
-  const tags = Array.isArray(game.tags)
-    ? game.tags.slice(0, 2)
-    : [];
+  const emulator =
+    game.emulator
+      ? escapeHTML(game.emulator)
+      : "";
+
+  const build =
+    game.build
+      ? escapeHTML(game.build)
+      : "";
+
+  /*
+   * Prefer genres, then tags.
+   */
+
+  const cardTags = (
+    game.genre.length
+      ? game.genre
+      : game.tags
+  ).slice(0, 2);
+
 
   const cover = game.image
+
     ? `
       <img
         src="${escapeHTML(game.image)}"
@@ -63,14 +230,18 @@ function gameCard(game) {
         loading="lazy"
       >
     `
+
     : `
       <div class="cover-placeholder">
         ${title}
       </div>
     `;
 
+
   return `
+
     <article class="game-card">
+
       <a
         href="game.html?id=${encodeURIComponent(game.id)}"
         aria-label="Open ${title}"
@@ -86,11 +257,16 @@ function gameCard(game) {
 
           ${
             build
-              ? `<span class="build-badge">${build}</span>`
+              ? `
+                <span class="build-badge">
+                  ${build}
+                </span>
+              `
               : ""
           }
 
         </div>
+
 
         <div class="card-info">
 
@@ -98,37 +274,65 @@ function gameCard(game) {
             ${title}
           </h3>
 
+
           <p class="card-meta">
-            ${emulator || platform}
+
+            ${
+              emulator ||
+              platform
+            }
+
             ${
               game.size
                 ? ` • ${escapeHTML(game.size)}`
                 : ""
             }
+
           </p>
 
+
           ${
-            tags.length
+            cardTags.length
+
               ? `
                 <div class="card-tags">
-                  ${tags.map(tag => `
-                    <span class="tag">
-                      ${escapeHTML(tag)}
-                    </span>
-                  `).join("")}
+
+                  ${
+                    cardTags
+                      .map(
+                        tag => `
+                          <span class="tag">
+                            ${escapeHTML(
+                              String(tag).trim()
+                            )}
+                          </span>
+                        `
+                      )
+                      .join("")
+                  }
+
                 </div>
               `
+
               : ""
           }
 
         </div>
 
       </a>
+
     </article>
+
   `;
 }
 
+
+/* =========================================================
+   GRID
+========================================================= */
+
 function renderGrid(target, games) {
+
   if (!target) return;
 
   target.innerHTML = games.length
@@ -137,338 +341,70 @@ function renderGrid(target, games) {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Convert Decap CMS JSON → Website format
-|--------------------------------------------------------------------------
-*/
-
-function normalizeGames(data) {
-
-  return data.map((game, index) => {
-
-    return {
-
-      id:
-        game.slug ||
-        game.id ||
-        `game-${index + 1}`,
-
-      title:
-        game.title ||
-        "Untitled Game",
-
-      platform:
-        game.platform ||
-        "Other",
-
-      emulator:
-        game.emulator ||
-        "",
-
-      image:
-        game.image ||
-        "",
-
-      /*
-       * Decap:
-       * size_gb
-       *
-       * Website:
-       * size
-       */
-      size:
-        game.size_gb ||
-        game.size ||
-        "",
-
-      build:
-        game.build ||
-        "",
-
-      description:
-        game.description ||
-        "",
-
-      tags:
-        Array.isArray(game.tags)
-          ? game.tags
-          : [],
-
-      genre:
-        Array.isArray(game.genre)
-          ? game.genre
-          : [],
-
-      views:
-        Number(game.views || 0),
-
-      added:
-        game.added ||
-        "",
-
-      /*
-       * Convert Decap field names
-       */
-
-      releaseYear:
-        game.release_year ||
-        game.releaseYear ||
-        "",
-
-      download:
-        game.download_link ||
-        game.download ||
-        "",
-
-      emulatorLink:
-        game.emulator_link ||
-        game.emulatorLink ||
-        "",
-
-      requirements: {
-
-        minRam:
-          game.min_ram ||
-          "",
-
-        recommendedRam:
-          game.recommended_ram ||
-          "",
-
-        gpu:
-          game.gpu ||
-          "",
-
-        android:
-          game.android_support ||
-          "",
-
-        vulkan:
-          game.vulkan_required === true
-
-      },
-
-      features: {
-
-        offline:
-          game.offline === true,
-
-        controller:
-          game.controller_support === true,
-
-        multiplayer:
-          game.multiplayer === true
-
-      },
-
-      fps: {
-
-        low:
-          game.fps_low ||
-          "",
-
-        medium:
-          game.fps_mid ||
-          "",
-
-        high:
-          game.fps_high ||
-          ""
-
-      }
-
-    };
-
-  });
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Load games
-|--------------------------------------------------------------------------
-*/
-
-async function loadGames() {
-
-  const recent = $("#recentGrid");
-  const top = $("#topGrid");
-  const all = $("#allGrid");
-
-  skeletons(recent, 4);
-  skeletons(top, 4);
-  skeletons(all, 8);
-
-  try {
-
-    /*
-     * IMPORTANT:
-     * cache-busting prevents an old games.json
-     * from being reused.
-     */
-
-    const response = await fetch(
-      `games.json?v=${Date.now()}`,
-      {
-        cache: "no-store"
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Could not load games.json (${response.status})`
-      );
-    }
-
-    const data = await response.json();
-
-    console.log("Gaming Hood database:", data);
-
-    state.games = normalizeGames(
-      Array.isArray(data.games)
-        ? data.games
-        : []
-    );
-
-    state.filtered = [...state.games];
-
-    renderHome();
-
-  } catch (error) {
-
-    console.error(
-      "Gaming Hood database error:",
-      error
-    );
-
-    if (recent) recent.innerHTML = "";
-    if (top) top.innerHTML = "";
-
-    if (all) {
-      all.innerHTML = `
-        <p class="empty-state">
-          The game database could not be loaded.
-        </p>
-      `;
-    }
-
-    showToast(
-      "Could not load the game database"
-    );
-  }
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Homepage
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
 function renderHome() {
 
   const newest = [...state.games]
+
     .sort(
       (a, b) =>
         new Date(b.added || 0) -
         new Date(a.added || 0)
     )
+
     .slice(0, 8);
 
+
   const top = [...state.games]
+
     .sort(
       (a, b) =>
         b.views - a.views
     )
+
     .slice(0, 8);
+
 
   renderGrid(
     $("#recentGrid"),
     newest
   );
 
+
   renderGrid(
     $("#topGrid"),
     top
   );
 
-  renderGrid(
-    $("#allGrid"),
-    state.filtered
-  );
-
-  updateResultCount();
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Search
-|--------------------------------------------------------------------------
-*/
-
-function filterGames(query) {
-
-  const q =
-    query
-      .trim()
-      .toLowerCase();
-
-  state.filtered =
-    !q
-      ? [...state.games]
-      : state.games.filter(game => {
-
-          const haystack = [
-
-            game.title,
-            game.platform,
-            game.emulator,
-            game.description,
-
-            ...(game.tags || []),
-            ...(game.genre || [])
-
-          ]
-          .join(" ")
-          .toLowerCase();
-
-          return haystack.includes(q);
-
-        });
 
   renderGrid(
     $("#allGrid"),
     state.filtered
   );
 
-  updateResultCount();
 
-  document
-    .querySelector("#games")
-    ?.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+  updateResults();
+
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Result counter
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   RESULTS
+========================================================= */
 
-function updateResultCount() {
+function updateResults() {
 
-  const count =
-    state.filtered.length;
+  const count = state.filtered.length;
 
   const resultCount =
     $("#resultCount");
+
+  const emptyState =
+    $("#emptyState");
+
 
   if (resultCount) {
 
@@ -477,12 +413,10 @@ function updateResultCount() {
 
   }
 
-  const empty =
-    $("#emptyState");
 
-  if (empty) {
+  if (emptyState) {
 
-    empty.hidden =
+    emptyState.hidden =
       count !== 0;
 
   }
@@ -490,16 +424,86 @@ function updateResultCount() {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Navigation
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function filterGames(query) {
+
+  const q =
+    String(query || "")
+      .trim()
+      .toLowerCase();
+
+
+  state.filtered = !q
+
+    ? [...state.games]
+
+    : state.games.filter(game => {
+
+        const haystack = [
+
+          game.title,
+
+          game.slug,
+
+          game.platform,
+
+          game.emulator,
+
+          game.description,
+
+          game.size,
+
+          game.build,
+
+          game.gpu,
+
+          game.android,
+
+          ...game.genre,
+
+          ...game.tags
+
+        ]
+
+          .join(" ")
+
+          .toLowerCase();
+
+
+        return haystack.includes(q);
+
+      });
+
+
+  renderGrid(
+    $("#allGrid"),
+    state.filtered
+  );
+
+
+  updateResults();
+
+
+  document
+    .querySelector("#games")
+    ?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+}
+
+
+/* =========================================================
+   DRAWER
+========================================================= */
 
 function openDrawer() {
 
-  $("#drawer")
-    ?.classList.add("open");
+  $("#drawer")?.classList.add("open");
 
   $("#drawerBackdrop")
     ?.classList.add("open");
@@ -515,7 +519,9 @@ function openDrawer() {
       "aria-expanded",
       "true"
     );
+
 }
+
 
 function closeDrawer() {
 
@@ -536,7 +542,13 @@ function closeDrawer() {
       "aria-expanded",
       "false"
     );
+
 }
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function setupNavigation() {
 
@@ -546,11 +558,13 @@ function setupNavigation() {
       openDrawer
     );
 
+
   $("#closeDrawer")
     ?.addEventListener(
       "click",
       closeDrawer
     );
+
 
   $("#drawerBackdrop")
     ?.addEventListener(
@@ -574,16 +588,21 @@ function setupNavigation() {
 
           if (!target) return;
 
+
           target.classList.toggle(
             "open"
           );
 
-          const span =
-            button.querySelector("span");
 
-          if (span) {
+          const arrow =
+            button.querySelector(
+              "span"
+            );
 
-            span.textContent =
+
+          if (arrow) {
+
+            arrow.textContent =
               target.classList.contains("open")
                 ? "⌃"
                 : "⌄";
@@ -645,6 +664,7 @@ function setupNavigation() {
         if (!state.games.length)
           return;
 
+
         const game =
           state.games[
             Math.floor(
@@ -653,8 +673,11 @@ function setupNavigation() {
             )
           ];
 
-        window.location.href =
-          `game.html?id=${encodeURIComponent(game.id)}`;
+
+        location.href =
+          `game.html?id=${encodeURIComponent(
+            game.id
+          )}`;
 
       }
     );
@@ -666,7 +689,8 @@ function setupNavigation() {
       () => {
 
         filterGames(
-          $("#heroSearchInput")?.value || ""
+          $("#heroSearchInput")
+            ?.value || ""
         );
 
       }
@@ -725,11 +749,113 @@ function setupNavigation() {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| PWA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   LOAD DATABASE
+========================================================= */
+
+async function loadGames() {
+
+  const recent =
+    $("#recentGrid");
+
+  const top =
+    $("#topGrid");
+
+  const all =
+    $("#allGrid");
+
+
+  skeletons(
+    recent,
+    4
+  );
+
+  skeletons(
+    top,
+    4
+  );
+
+  skeletons(
+    all,
+    8
+  );
+
+
+  try {
+
+    const response =
+      await fetch(
+        "./games.json",
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Could not load games.json"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    state.games =
+      normalizeGames(
+        Array.isArray(data.games)
+          ? data.games
+          : []
+      );
+
+
+    state.filtered =
+      [...state.games];
+
+
+    renderHome();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    if (recent)
+      recent.innerHTML = "";
+
+
+    if (top)
+      top.innerHTML = "";
+
+
+    if (all) {
+
+      all.innerHTML = `
+        <p class="empty-state">
+          The game database could not be loaded.
+        </p>
+      `;
+
+    }
+
+
+    showToast(
+      "Could not load the game database"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PWA
+========================================================= */
 
 function setupPWA() {
 
@@ -741,10 +867,12 @@ function setupPWA() {
       "load",
       () => {
 
-        navigator.serviceWorker
+        navigator
+          .serviceWorker
           .register(
             "./service-worker.js"
           )
+
           .catch(
             error =>
               console.warn(
@@ -761,11 +889,9 @@ function setupPWA() {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Start
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   START
+========================================================= */
 
 const year =
   $("#year");
@@ -777,6 +903,9 @@ if (year) {
 
 }
 
+
 setupNavigation();
+
 setupPWA();
+
 loadGames();
