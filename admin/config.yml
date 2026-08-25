@@ -2,9 +2,6 @@ backend:
   name: github
   repo: haisboy4/Gaming-Hood-Tz
   branch: main
-  base_url: https://api.netlify.com
-  auth_endpoint: auth
-  site_domain: gaminghoodtz.netlify.app
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
