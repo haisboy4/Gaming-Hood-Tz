@@ -1,0 +1,28 @@
+{
+  "id": "sample-android-game",
+  "title": "Android Game Example",
+  "platform": "Android",
+  "emulator": "",
+  "image": "",
+  "size": "2.4 GB",
+  "build": "",
+  "description": "Example database record. Replace this with your actual game.",
+  "tags": [
+    "Android"
+  ],
+  "views": 7600,
+  "added": "2026-08-18",
+  "releaseYear": 2026,
+  "requirements": {
+    "minRam": 3,
+    "recommendedRam": 4,
+    "gpu": "Adreno 5xx / Mali equivalent",
+    "android": "8+"
+  },
+  "features": {
+    "offline": true,
+    "controller": false,
+    "multiplayer": false
+  },
+  "download": ""
+}

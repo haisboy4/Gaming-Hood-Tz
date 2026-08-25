@@ -1,23 +1,24 @@
 {
-  "id": "9-keys",
-  "title": "9 Keys",
+  "id": "hollowbody",
+  "title": "Hollowbody",
   "platform": "PC",
   "emulator": "",
   "image": "",
   "size": "PC",
-  "build": "Build 18961968",
-  "description": "An atmospheric adventure with exploration and mystery.",
+  "build": "Build 21621978",
+  "description": "A survival horror game set in a decaying exclusion zone.",
   "tags": [
+    "Horror",
     "Adventure",
     "Indie"
   ],
-  "views": 12100,
-  "added": "2026-08-22",
-  "releaseYear": 2026,
+  "views": 22275,
+  "added": "2026-08-25",
+  "releaseYear": 2024,
   "requirements": {
     "minRam": 4,
     "recommendedRam": 8,
-    "gpu": "Modern GPU"
+    "gpu": "Dedicated GPU recommended"
   },
   "features": {
     "offline": true,

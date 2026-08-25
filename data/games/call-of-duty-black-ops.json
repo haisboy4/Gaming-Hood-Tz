@@ -1,0 +1,31 @@
+{
+  "id": "call-of-duty-black-ops",
+  "title": "Call of Duty: Black Ops",
+  "platform": "PC",
+  "emulator": "Winlator",
+  "image": "",
+  "size": "8.2 GB",
+  "build": "",
+  "description": "Placeholder entry for the Gaming Hood compatibility system.",
+  "tags": [
+    "Shooter",
+    "Action",
+    "Winlator"
+  ],
+  "views": 9800,
+  "added": "2026-08-20",
+  "releaseYear": 2010,
+  "requirements": {
+    "minRam": 4,
+    "recommendedRam": 6,
+    "gpu": "Adreno 630 / equivalent",
+    "android": "9+",
+    "vulkan": true
+  },
+  "features": {
+    "offline": true,
+    "controller": true,
+    "multiplayer": true
+  },
+  "download": ""
+}
