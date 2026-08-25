@@ -4,6 +4,10 @@ const $ = selector =>
 let games = [];
 
 
+/* =========================================================
+   SECURITY
+========================================================= */
+
 function escapeHTML(value = "") {
 
   return String(value).replace(
@@ -19,6 +23,10 @@ function escapeHTML(value = "") {
 
 }
 
+
+/* =========================================================
+   TOAST
+========================================================= */
 
 function showToast(message) {
 
@@ -47,6 +55,10 @@ function showToast(message) {
 }
 
 
+/* =========================================================
+   GET GAME ID
+========================================================= */
+
 function getGameId() {
 
   return new URLSearchParams(
@@ -55,6 +67,10 @@ function getGameId() {
 
 }
 
+
+/* =========================================================
+   PLACEHOLDER IMAGE
+========================================================= */
 
 function placeholderImage(
   title,
@@ -74,16 +90,24 @@ function placeholderImage(
 }
 
 
+/* =========================================================
+   IMAGE
+========================================================= */
+
 function gameImage(
   game,
   wide = false
 ) {
 
-  if (!game.image)
+  if (!game.image) {
+
     return placeholderImage(
       game.title,
       wide
     );
+
+  }
+
 
   return `
     <img
@@ -96,54 +120,100 @@ function gameImage(
 }
 
 
+/* =========================================================
+   INFO ROW
+========================================================= */
+
 function infoRow(
   label,
   value
 ) {
 
   if (
-    !value &&
-    value !== 0
+    value === "" ||
+    value === null ||
+    value === undefined
   ) {
 
     return "";
 
   }
 
+
   return `
     <div class="info-row">
-      <span>${escapeHTML(label)}</span>
-      <strong>${escapeHTML(value)}</strong>
+
+      <span>
+        ${escapeHTML(label)}
+      </span>
+
+      <strong>
+        ${escapeHTML(value)}
+      </strong>
+
     </div>
   `;
 
 }
 
 
+/* =========================================================
+   TAGS / GENRES
+========================================================= */
+
 function tags(game) {
 
-  const values =
-    Array.isArray(game.tags)
-      ? game.tags
-      : [];
+  /*
+   * Genre is the main category.
+   * Tags are secondary labels.
+   */
 
-  return values
+  const values = [
+
+    ...(Array.isArray(game.genre)
+      ? game.genre
+      : []),
+
+    ...(Array.isArray(game.tags)
+      ? game.tags
+      : [])
+
+  ]
+
     .map(
-      tag =>
-        `<span class="game-tag">
-          ${escapeHTML(tag)}
-        </span>`
+      value =>
+        String(value).trim()
     )
+
+    .filter(Boolean);
+
+
+  /*
+   * Remove duplicates.
+   */
+
+  const unique =
+    [...new Set(values)];
+
+
+  return unique
+
+    .map(
+      tag => `
+        <span class="game-tag">
+          ${escapeHTML(tag)}
+        </span>
+      `
+    )
+
     .join("");
 
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Convert Decap CMS format
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   NORMALIZE GAME
+========================================================= */
 
 function normalizeGame(game) {
 
@@ -152,12 +222,100 @@ function normalizeGame(game) {
     ...game,
 
     id:
+      game.id ||
       game.slug ||
-      game.id,
+      "",
+
+    title:
+      game.title ||
+      "Untitled Game",
+
+    platform:
+      game.platform ||
+      "Other",
+
+    emulator:
+      game.emulator ||
+      "",
+
+    genre:
+      Array.isArray(game.genre)
+        ? game.genre
+        : [],
+
+    tags:
+      Array.isArray(game.tags)
+        ? game.tags
+        : [],
+
+    image:
+      game.image ||
+      "",
+
+    description:
+      game.description ||
+      "",
 
     size:
       game.size_gb ||
       game.size ||
+      "",
+
+    build:
+      game.build ||
+      "",
+
+    releaseYear:
+      game.release_year ||
+      game.releaseYear ||
+      "",
+
+    minRam:
+      game.min_ram ||
+      "",
+
+    recommendedRam:
+      game.recommended_ram ||
+      "",
+
+    gpu:
+      game.gpu ||
+      "",
+
+    android:
+      game.android_support ||
+      "",
+
+    offline:
+      typeof game.offline === "boolean"
+        ? game.offline
+        : null,
+
+    controller:
+      typeof game.controller_support === "boolean"
+        ? game.controller_support
+        : null,
+
+    multiplayer:
+      typeof game.multiplayer === "boolean"
+        ? game.multiplayer
+        : null,
+
+    vulkan:
+      typeof game.vulkan_required === "boolean"
+        ? game.vulkan_required
+        : null,
+
+    fpsLow:
+      game.fps_low ||
+      "",
+
+    fpsMid:
+      game.fps_mid ||
+      "",
+
+    fpsHigh:
+      game.fps_high ||
       "",
 
     download:
@@ -169,51 +327,23 @@ function normalizeGame(game) {
       game.emulator_link ||
       "",
 
-    releaseYear:
-      game.release_year ||
-      game.releaseYear ||
-      "",
+    views:
+      Number(
+        game.views || 0
+      ),
 
-    requirements: {
-
-      minRam:
-        game.min_ram ||
-        "",
-
-      recommendedRam:
-        game.recommended_ram ||
-        "",
-
-      gpu:
-        game.gpu ||
-        "",
-
-      android:
-        game.android_support ||
-        "",
-
-      vulkan:
-        game.vulkan_required === true
-
-    },
-
-    features: {
-
-      offline:
-        game.offline === true,
-
-      controller:
-        game.controller_support === true,
-
-      multiplayer:
-        game.multiplayer === true
-
-    }
+    added:
+      game.added ||
+      ""
 
   };
 
 }
 
+
+/* =========================================================
+   RENDER GAME
+========================================================= */
 
 function renderGame(game) {
 
@@ -221,14 +351,9 @@ function renderGame(game) {
     `${game.title} — Gaming Hood`;
 
 
-  const requirements =
-    game.requirements || {};
-
-  const features =
-    game.features || {};
-
-
   $("#gameContent").innerHTML = `
+
+    <!-- BREADCRUMBS -->
 
     <nav class="breadcrumbs">
 
@@ -238,32 +363,44 @@ function renderGame(game) {
 
       <span>»</span>
 
-      <a href="category.html?platform=${encodeURIComponent(
-        game.platform || "Other"
-      )}">
+      <a
+        href="category.html?platform=${encodeURIComponent(
+          game.platform
+        )}"
+      >
         ${escapeHTML(
-          game.platform || "Other"
+          game.platform
         )}
       </a>
 
       <span>»</span>
 
       <strong>
-        ${escapeHTML(game.title)}
+        ${escapeHTML(
+          game.title
+        )}
       </strong>
 
     </nav>
 
+
+    <!-- TAGS -->
 
     <div class="game-tags">
       ${tags(game)}
     </div>
 
 
+    <!-- TITLE -->
+
     <h1 class="game-title">
-      ${escapeHTML(game.title)}
+      ${escapeHTML(
+        game.title
+      )}
     </h1>
 
+
+    <!-- META -->
 
     <div class="game-meta">
 
@@ -287,32 +424,36 @@ function renderGame(game) {
 
       ${
         game.views
+
           ? `
             <span>•</span>
+
             <span>
+              🔥
               ${escapeHTML(
-                Number(
-                  game.views
-                ).toLocaleString()
+                game.views.toLocaleString()
               )}
               views
             </span>
           `
+
           : ""
       }
 
     </div>
 
 
-    <div class="game-hero-image">
+    <!-- HERO IMAGE -->
 
+    <div class="game-hero-image">
       ${gameImage(
         game,
         true
       )}
-
     </div>
 
+
+    <!-- ABOUT -->
 
     <section class="game-card-section">
 
@@ -321,20 +462,25 @@ function renderGame(game) {
       </h2>
 
       <p class="game-description">
+
         ${escapeHTML(
           game.description ||
           "Game information will be added soon."
         )}
+
       </p>
 
     </section>
 
+
+    <!-- GAME INFORMATION -->
 
     <section class="game-card-section">
 
       <h2>
         Game Information
       </h2>
+
 
       <div class="info-grid">
 
@@ -366,29 +512,37 @@ function renderGame(game) {
 
         ${infoRow(
           "Offline",
-          features.offline
+          game.offline === true
             ? "Yes"
-            : "No"
+            : game.offline === false
+              ? "No"
+              : "Not specified"
         )}
 
         ${infoRow(
           "Controller",
-          features.controller
+          game.controller === true
             ? "Supported"
-            : "Not specified"
+            : game.controller === false
+              ? "Not supported"
+              : "Not specified"
         )}
 
         ${infoRow(
           "Multiplayer",
-          features.multiplayer
+          game.multiplayer === true
             ? "Supported"
-            : "Not supported"
+            : game.multiplayer === false
+              ? "Not supported"
+              : "Not specified"
         )}
 
       </div>
 
     </section>
 
+
+    <!-- COMPATIBILITY -->
 
     <section class="compat-card">
 
@@ -410,6 +564,7 @@ function renderGame(game) {
 
       </div>
 
+
       <a
         class="primary-btn"
         href="compatibility.html?game=${encodeURIComponent(
@@ -422,49 +577,116 @@ function renderGame(game) {
     </section>
 
 
+    <!-- REQUIREMENTS -->
+
     <section class="game-card-section">
 
       <h2>
         Requirements
       </h2>
 
+
       <div class="requirements">
 
         ${infoRow(
           "Minimum RAM",
-          requirements.minRam
-            ? `${requirements.minRam} GB`
+          game.minRam
+            ? `${game.minRam} GB`
             : ""
         )}
 
         ${infoRow(
           "Recommended RAM",
-          requirements.recommendedRam
-            ? `${requirements.recommendedRam} GB`
+          game.recommendedRam
+            ? `${game.recommendedRam} GB`
             : ""
         )}
 
         ${infoRow(
           "GPU",
-          requirements.gpu
+          game.gpu
         )}
 
         ${infoRow(
           "Android",
-          requirements.android
+          game.android
         )}
 
         ${infoRow(
           "Vulkan",
-          game.vulkan_required === true
+          game.vulkan === true
             ? "Required"
-            : "Not required"
+            : game.vulkan === false
+              ? "Not required"
+              : "Not specified"
         )}
 
       </div>
 
+
+      ${
+        !game.minRam &&
+        !game.recommendedRam &&
+        !game.gpu &&
+        !game.android &&
+        game.vulkan === null
+
+          ? `
+            <p class="muted">
+              Requirements have not been added
+              for this game yet.
+            </p>
+          `
+
+          : ""
+      }
+
     </section>
 
+
+    <!-- FPS -->
+
+    ${
+      game.fpsLow ||
+      game.fpsMid ||
+      game.fpsHigh
+
+        ? `
+
+          <section class="game-card-section">
+
+            <h2>
+              Expected Performance
+            </h2>
+
+            <div class="requirements">
+
+              ${infoRow(
+                "Low Settings",
+                game.fpsLow
+              )}
+
+              ${infoRow(
+                "Medium Settings",
+                game.fpsMid
+              )}
+
+              ${infoRow(
+                "High Settings",
+                game.fpsHigh
+              )}
+
+            </div>
+
+          </section>
+
+        `
+
+        : ""
+    }
+
+
+    <!-- DOWNLOAD -->
 
     <section class="download-card">
 
@@ -481,8 +703,10 @@ function renderGame(game) {
         download link for this game.
       </p>
 
+
       ${
         game.download
+
           ? `
             <a
               class="download-btn"
@@ -495,6 +719,7 @@ function renderGame(game) {
               Download Game
             </a>
           `
+
           : `
             <button
               class="download-btn disabled"
@@ -505,8 +730,30 @@ function renderGame(game) {
           `
       }
 
+
+      ${
+        game.emulatorLink
+
+          ? `
+            <a
+              class="download-btn"
+              href="${escapeHTML(
+                game.emulatorLink
+              )}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download Emulator
+            </a>
+          `
+
+          : ""
+      }
+
     </section>
 
+
+    <!-- INSTALLATION -->
 
     <section class="game-card-section">
 
@@ -530,13 +777,13 @@ function renderGame(game) {
         </li>
 
         <li>
-          Follow the game's platform-specific
-          setup instructions.
+          Follow the game's
+          platform-specific setup instructions.
         </li>
 
         <li>
-          Launch the game and adjust settings
-          if necessary.
+          Launch the game and adjust
+          settings if necessary.
         </li>
 
       </ol>
@@ -544,11 +791,14 @@ function renderGame(game) {
     </section>
 
 
+    <!-- SHARE -->
+
     <section class="game-card-section share-section">
 
       <h2>
         Share this game
       </h2>
+
 
       <div class="share-buttons">
 
@@ -577,6 +827,8 @@ function renderGame(game) {
     </section>
 
 
+    <!-- RELATED -->
+
     <section class="game-card-section">
 
       <div class="section-heading">
@@ -595,6 +847,7 @@ function renderGame(game) {
 
       </div>
 
+
       <div
         class="game-grid related-grid"
         id="relatedGrid"
@@ -612,129 +865,175 @@ function renderGame(game) {
 }
 
 
+/* =========================================================
+   RELATED GAMES
+========================================================= */
+
 function renderRelated(current) {
 
-  const related =
-    games
+  const related = games
 
-      .filter(
-        g =>
-          g.id !== current.id
-      )
+    .filter(
+      game =>
+        game.id !== current.id
+    )
 
-      .map(g => ({
+    .map(game => {
 
-        game: g,
+      const samePlatform =
+        game.platform ===
+        current.platform
+          ? 3
+          : 0;
+
+
+      const sameEmulator =
+        game.emulator &&
+        current.emulator &&
+        game.emulator ===
+        current.emulator
+          ? 2
+          : 0;
+
+
+      const currentGenres = [
+        ...(current.genre || []),
+        ...(current.tags || [])
+      ];
+
+
+      const sharedGenre =
+        [
+          ...(game.genre || []),
+          ...(game.tags || [])
+        ]
+
+          .some(tag =>
+            currentGenres.includes(
+              tag
+            )
+          )
+          ? 1
+          : 0;
+
+
+      return {
+
+        game,
 
         score:
+          samePlatform +
+          sameEmulator +
+          sharedGenre
 
-          (
-            g.platform ===
-            current.platform
-              ? 3
-              : 0
-          )
+      };
 
-          +
+    })
 
-          (
-            g.emulator &&
-            g.emulator ===
-            current.emulator
-              ? 2
-              : 0
-          )
+    .sort(
+      (a, b) =>
+        b.score - a.score
+    )
 
-          +
+    .slice(0, 4)
 
-          (
-            (g.tags || [])
-              .some(
-                t =>
-                  (current.tags || [])
-                    .includes(t)
-              )
-              ? 1
-              : 0
-          )
-
-      }))
-
-      .sort(
-        (a, b) =>
-          b.score - a.score
-      )
-
-      .slice(0, 4)
-
-      .map(
-        x => x.game
-      );
+    .map(
+      item => item.game
+    );
 
 
-  $("#relatedGrid").innerHTML =
+  const grid =
+    $("#relatedGrid");
 
-    related
 
-      .map(g => `
+  if (!grid) return;
 
-        <article class="game-card">
 
-          <a href="game.html?id=${encodeURIComponent(g.id)}">
+  grid.innerHTML =
+    related.length
 
-            <div class="cover">
+      ? related.map(game => `
 
-              ${
-                g.image
-                  ? `
-                    <img
-                      src="${escapeHTML(g.image)}"
-                      alt="${escapeHTML(g.title)}"
-                      loading="lazy"
-                    >
-                  `
-                  : placeholderImage(
-                      g.title
-                    )
-              }
+          <article class="game-card">
 
-              <span class="platform-badge">
-                ${escapeHTML(
-                  g.platform ||
-                  "Game"
-                )}
-              </span>
+            <a
+              href="game.html?id=${encodeURIComponent(
+                game.id
+              )}"
+            >
 
-            </div>
+              <div class="cover">
 
-            <div class="card-info">
+                ${
+                  game.image
 
-              <h3 class="card-title">
-                ${escapeHTML(
-                  g.title
-                )}
-              </h3>
+                    ? `
+                      <img
+                        src="${escapeHTML(
+                          game.image
+                        )}"
+                        alt="${escapeHTML(
+                          game.title
+                        )}"
+                        loading="lazy"
+                      >
+                    `
 
-              <p class="card-meta">
-                ${escapeHTML(
-                  g.emulator ||
-                  g.platform ||
-                  ""
-                )}
-              </p>
+                    : placeholderImage(
+                        game.title
+                      )
+                }
 
-            </div>
 
-          </a>
+                <span class="platform-badge">
+                  ${escapeHTML(
+                    game.platform ||
+                    "Game"
+                  )}
+                </span>
 
-        </article>
+              </div>
 
-      `)
 
-      .join("");
+              <div class="card-info">
+
+                <h3 class="card-title">
+                  ${escapeHTML(
+                    game.title
+                  )}
+                </h3>
+
+
+                <p class="card-meta">
+
+                  ${escapeHTML(
+                    game.emulator ||
+                    game.platform ||
+                    ""
+                  )}
+
+                </p>
+
+              </div>
+
+            </a>
+
+          </article>
+
+        `).join("")
+
+      : `
+        <p class="muted">
+          No related games yet.
+        </p>
+      `;
 
 }
 
+
+/* =========================================================
+   SHARING
+========================================================= */
 
 function setupSharing(game) {
 
@@ -749,9 +1048,7 @@ function setupSharing(game) {
 
 
   document
-    .querySelectorAll(
-      "[data-share]"
-    )
+    .querySelectorAll("[data-share]")
     .forEach(button => {
 
       button.addEventListener(
@@ -780,14 +1077,21 @@ function setupSharing(game) {
 
               } catch {}
 
-            } else {
+            }
 
-              await navigator.clipboard
-                ?.writeText(url);
+            else {
 
-              showToast(
-                "Link copied"
-              );
+              try {
+
+                await navigator
+                  .clipboard
+                  .writeText(url);
+
+                showToast(
+                  "Link copied"
+                );
+
+              } catch {}
 
             }
 
@@ -802,7 +1106,8 @@ function setupSharing(game) {
 
             try {
 
-              await navigator.clipboard
+              await navigator
+                .clipboard
                 .writeText(url);
 
               showToast(
@@ -865,6 +1170,10 @@ function setupSharing(game) {
 }
 
 
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
 function setupNavigation() {
 
   const open = () => {
@@ -907,11 +1216,13 @@ function setupNavigation() {
       open
     );
 
+
   $("#closeDrawer")
     ?.addEventListener(
       "click",
       close
     );
+
 
   $("#drawerBackdrop")
     ?.addEventListener(
@@ -933,21 +1244,23 @@ function setupNavigation() {
               button.dataset.target
             );
 
-          if (!target)
-            return;
+          if (!target) return;
+
 
           target.classList.toggle(
             "open"
           );
 
-          const span =
+
+          const arrow =
             button.querySelector(
               "span"
             );
 
-          if (span) {
 
-            span.textContent =
+          if (arrow) {
+
+            arrow.textContent =
               target.classList.contains(
                 "open"
               )
@@ -971,185 +1284,4 @@ function setupNavigation() {
 
         const q =
           $("#drawerSearchInput")
-            ?.value
-            ?.trim();
-
-        if (q) {
-
-          location.href =
-            `./?search=${encodeURIComponent(q)}#games`;
-
-        }
-
-      }
-    );
-
-
-  $("#randomBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        if (!games.length)
-          return;
-
-        const random =
-          games[
-            Math.floor(
-              Math.random() *
-              games.length
-            )
-          ];
-
-        location.href =
-          `game.html?id=${encodeURIComponent(random.id)}`;
-
-      }
-    );
-
-}
-
-
-async function init() {
-
-  setupNavigation();
-
-
-  try {
-
-    /*
-     * Cache-busting is intentional.
-     */
-
-    const response =
-      await fetch(
-        `games.json?v=${Date.now()}`,
-        {
-          cache: "no-store"
-        }
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Database unavailable"
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    games =
-      Array.isArray(data.games)
-        ? data.games.map(
-            normalizeGame
-          )
-        : [];
-
-
-    console.log(
-      "Gaming Hood games:",
-      games
-    );
-
-
-    const id =
-      getGameId();
-
-
-    const game =
-      games.find(
-        item =>
-          item.id === id
-      );
-
-
-    if (!game) {
-
-      $("#gameContent").innerHTML = `
-
-        <div class="not-found">
-
-          <h1>
-            Game not found
-          </h1>
-
-          <p>
-            The game you're looking for
-            does not exist in the Gaming Hood
-            database.
-          </p>
-
-          <a
-            class="primary-btn"
-            href="./"
-          >
-            Back to Gaming Hood
-          </a>
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    renderGame(game);
-
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    $("#gameContent").innerHTML = `
-
-      <div class="not-found">
-
-        <h1>
-          Unable to load game
-        </h1>
-
-        <p>
-          Please check your connection
-          and try again.
-        </p>
-
-        <a
-          class="primary-btn"
-          href="./"
-        >
-          Back to home
-        </a>
-
-      </div>
-
-    `;
-
-  }
-
-
-  if (
-    "serviceWorker" in navigator
-  ) {
-
-    navigator.serviceWorker
-      .register(
-        "./service-worker.js"
-      )
-      .catch(
-        console.warn
-      );
-
-  }
-
-}
-
-
-init();
+        
