@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#170d25">
+  <meta name="description" content="Gaming Hood — games, emulators, compatibility and gaming resources.">
+  <title>Gaming Hood</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header class="site-header">
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a class="brand" href="./" aria-label="Gaming Hood home">
+      <div class="brand-mark">GH</div>
+      <span>GAMING HOOD</span>
+    </a>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="randomBtn" aria-label="Random game" title="Random game">⚄</button>
+      <button class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-top">
+      <strong>Gaming Hood</strong>
+      <button class="close-btn" id="closeDrawer" aria-label="Close menu">×</button>
+    </div>
+
+    <form class="drawer-search" id="drawerSearchForm">
+      <input id="drawerSearchInput" type="search" placeholder="Search games..." autocomplete="off">
+      <button type="submit">⌕</button>
+    </form>
+
+    <nav class="drawer-nav">
+      <a href="./">Home</a>
+
+      <button class="nav-drop" data-target="categoriesMenu">
+        Categories <span>⌄</span>
+      </button>
+      <div class="subnav" id="categoriesMenu">
+        <a href="category.html?platform=Android">Android</a>
+        <a href="category.html?platform=PC">PC</a>
+        <a href="category.html?platform=Winlator">Winlator</a>
+        <a href="category.html?platform=PSP">PSP</a>
+        <a href="category.html?platform=PS%20Vita">PS Vita</a>
+        <a href="category.html?platform=PS2">PS2</a>
+        <a href="category.html?platform=Wii">Wii</a>
+      </div>
+
+      <a href="#top-games">Top Games</a>
+      <a href="#recent-updates">Recent Updates</a>
+
+      <button class="nav-drop" data-target="gamesListMenu">
+        Games List <span>⌄</span>
+      </button>
+      <div class="subnav" id="gamesListMenu">
+        <a href="#games">All Games</a>
+        <a href="category.html?sort=az">A–Z</a>
+        <a href="category.html?sort=za">Z–A</a>
+      </div>
+
+      <a href="compatibility.html">Compatibility Checker</a>
+      <a href="#emulators">Emulators</a>
+
+      <button class="nav-drop" data-target="faqMenu">
+        FAQ <span>⌄</span>
+      </button>
+      <div class="subnav" id="faqMenu">
+        <a href="faq.html">Common Questions</a>
+        <a href="faq.html#installation">Installation</a>
+        <a href="faq.html#compatibility">Compatibility</a>
+      </div>
+
+      <a href="#request">Request a Game</a>
+      <a href="#about">About Gaming Hood</a>
+    </nav>
+  </aside>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">YOUR GAMING HUB</p>
+      <h1>Find your next game.</h1>
+      <p class="hero-text">Games, emulators, compatibility information and useful guides — organized in one place.</p>
+      <div class="hero-search">
+        <input id="heroSearchInput" type="search" placeholder="Search games, platforms, emulators..." autocomplete="off">
+        <button id="heroSearchBtn">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="section" id="recent-updates">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">LATEST</p>
+          <h2>Recently Added</h2>
+        </div>
+        <a href="category.html?sort=recent">View all</a>
+      </div>
+      <div class="game-grid" id="recentGrid"></div>
+    </section>
+
+    <section class="section" id="top-games">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">POPULAR</p>
+          <h2>Top Games</h2>
+        </div>
+        <a href="category.html?sort=top">View all</a>
+      </div>
+      <div class="game-grid" id="topGrid"></div>
+    </section>
+
+    <section class="section categories-section">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">EXPLORE</p>
+          <h2>Categories</h2>
+        </div>
+      </div>
+      <div class="category-grid">
+        <a href="category.html?platform=Android">Android</a>
+        <a href="category.html?platform=PC">PC</a>
+        <a href="category.html?platform=Winlator">Winlator</a>
+        <a href="category.html?platform=PSP">PSP</a>
+        <a href="category.html?platform=PS%20Vita">PS Vita</a>
+        <a href="category.html?platform=PS2">PS2</a>
+        <a href="category.html?platform=Wii">Wii</a>
+        <a href="category.html?platform=GameCube">GameCube</a>
+      </div>
+    </section>
+
+    <section class="section feature-strip">
+      <div>
+        <p class="section-kicker">CHECK BEFORE YOU DOWNLOAD</p>
+        <h2>Can your device run it?</h2>
+        <p>Use the Gaming Hood compatibility checker to compare a game's requirements with your Android device.</p>
+      </div>
+      <a class="primary-btn" href="compatibility.html">Check compatibility</a>
+    </section>
+
+    <section class="section" id="games">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">LIBRARY</p>
+          <h2>All Games</h2>
+        </div>
+        <span class="result-count" id="resultCount"></span>
+      </div>
+
+      <div class="inline-search">
+        <input id="librarySearchInput" type="search" placeholder="Filter the game library..." autocomplete="off">
+      </div>
+      <div class="game-grid" id="allGrid"></div>
+      <p class="empty-state" id="emptyState" hidden>No games matched your search.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="about">
+    <div>
+      <strong>Gaming Hood</strong>
+      <p>A gaming-focused website for games, emulators, compatibility and guides.</p>
+    </div>
+    <div class="footer-links">
+      <a href="compatibility.html">Compatibility</a>
+      <a href="faq.html">FAQ</a>
+      <a href="#request">Request a Game</a>
+    </div>
+    <p class="copyright">© <span id="year"></span> Gaming Hood</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>

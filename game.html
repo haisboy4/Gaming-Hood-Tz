@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#170d25">
+  <meta name="description" content="Gaming Hood game details.">
+  <title>Game — Gaming Hood</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header class="site-header">
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" href="./" aria-label="Gaming Hood home">
+      <div class="brand-mark">GH</div>
+      <span>GAMING HOOD</span>
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn" id="randomBtn" aria-label="Random game" title="Random game">⚄</button>
+      <a class="icon-btn" href="./#games" aria-label="Search">⌕</a>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-top">
+      <strong>Gaming Hood</strong>
+      <button class="close-btn" id="closeDrawer" aria-label="Close menu">×</button>
+    </div>
+    <form class="drawer-search" id="drawerSearchForm">
+      <input id="drawerSearchInput" type="search" placeholder="Search games..." autocomplete="off">
+      <button type="submit">⌕</button>
+    </form>
+    <nav class="drawer-nav">
+      <a href="./">Home</a>
+      <button class="nav-drop" data-target="categoriesMenu">Categories <span>⌄</span></button>
+      <div class="subnav" id="categoriesMenu">
+        <a href="category.html?platform=Android">Android</a>
+        <a href="category.html?platform=PC">PC</a>
+        <a href="category.html?platform=Winlator">Winlator</a>
+        <a href="category.html?platform=PSP">PSP</a>
+        <a href="category.html?platform=PS%20Vita">PS Vita</a>
+        <a href="category.html?platform=PS2">PS2</a>
+        <a href="category.html?platform=Wii">Wii</a>
+      </div>
+      <a href="./#top-games">Top Games</a>
+      <a href="./#recent-updates">Recent Updates</a>
+      <a href="./#games">Games List</a>
+      <a href="compatibility.html">Compatibility Checker</a>
+      <a href="./#emulators">Emulators</a>
+      <a href="faq.html">FAQ</a>
+      <a href="./#request">Request a Game</a>
+      <a href="./#about">About Gaming Hood</a>
+    </nav>
+  </aside>
+
+  <main class="game-page">
+    <div class="game-shell" id="gameContent">
+      <div class="game-loading">
+        <div class="skeleton skeleton-hero-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-lines"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/game-page.js" defer></script>
+</body>
+</html>
