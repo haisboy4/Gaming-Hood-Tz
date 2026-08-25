@@ -1284,4 +1284,190 @@ function setupNavigation() {
 
         const q =
           $("#drawerSearchInput")
-        
+            ?.value
+            .trim();
+
+
+        if (q) {
+
+          location.href =
+            `./?search=${encodeURIComponent(q)}#games`;
+
+        }
+
+      }
+    );
+
+
+  $("#randomBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        if (!games.length)
+          return;
+
+
+        const random =
+          games[
+            Math.floor(
+              Math.random() *
+              games.length
+            )
+          ];
+
+
+        location.href =
+          `game.html?id=${encodeURIComponent(
+            random.id
+          )}`;
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   LOAD DATABASE
+========================================================= */
+
+async function init() {
+
+  setupNavigation();
+
+
+  try {
+
+    const response =
+      await fetch(
+        "./games.json",
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Database unavailable"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    games =
+      Array.isArray(data.games)
+
+        ? data.games.map(
+            normalizeGame
+          )
+
+        : [];
+
+
+    const id =
+      getGameId();
+
+
+    const game =
+      games.find(
+        item =>
+          item.id === id ||
+          item.slug === id
+      );
+
+
+    if (!game) {
+
+      $("#gameContent").innerHTML = `
+
+        <div class="not-found">
+
+          <h1>
+            Game not found
+          </h1>
+
+          <p>
+            The game you're looking for
+            does not exist in the
+            Gaming Hood database.
+          </p>
+
+          <a
+            class="primary-btn"
+            href="./"
+          >
+            Back to Gaming Hood
+          </a>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    renderGame(game);
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    $("#gameContent").innerHTML = `
+
+      <div class="not-found">
+
+        <h1>
+          Unable to load game
+        </h1>
+
+        <p>
+          Please check your connection
+          and try again.
+        </p>
+
+        <a
+          class="primary-btn"
+          href="./"
+        >
+          Back to home
+        </a>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /*
+   * Service worker
+   */
+
+  if (
+    "serviceWorker" in navigator
+  ) {
+
+    navigator
+      .serviceWorker
+      .register(
+        "./service-worker.js"
+      )
+      .catch(console.warn);
+
+  }
+
+}
+
+
+init();
