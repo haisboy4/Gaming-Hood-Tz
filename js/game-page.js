@@ -3,7 +3,9 @@ const $ = selector =>
 
 let games = [];
 
+
 function escapeHTML(value = "") {
+
   return String(value).replace(
     /[&<>"']/g,
     char => ({
@@ -14,21 +16,20 @@ function escapeHTML(value = "") {
       "'": "&#039;"
     }[char])
   );
+
 }
+
 
 function showToast(message) {
 
-  const toast =
-    $("#toast");
+  const toast = $("#toast");
 
   if (!toast) return;
 
   toast.textContent =
     message;
 
-  toast.classList.add(
-    "show"
-  );
+  toast.classList.add("show");
 
   clearTimeout(
     showToast.timer
@@ -42,14 +43,18 @@ function showToast(message) {
         ),
       2200
     );
+
 }
+
 
 function getGameId() {
 
   return new URLSearchParams(
     location.search
   ).get("id");
+
 }
+
 
 function placeholderImage(
   title,
@@ -65,19 +70,20 @@ function placeholderImage(
       ${escapeHTML(title)}
     </div>
   `;
+
 }
+
 
 function gameImage(
   game,
   wide = false
 ) {
 
-  if (!game.image) {
+  if (!game.image)
     return placeholderImage(
       game.title,
       wide
     );
-  }
 
   return `
     <img
@@ -86,7 +92,9 @@ function gameImage(
       loading="eager"
     >
   `;
+
 }
+
 
 function infoRow(
   label,
@@ -97,21 +105,20 @@ function infoRow(
     !value &&
     value !== 0
   ) {
+
     return "";
+
   }
 
   return `
     <div class="info-row">
-      <span>
-        ${escapeHTML(label)}
-      </span>
-
-      <strong>
-        ${escapeHTML(value)}
-      </strong>
+      <span>${escapeHTML(label)}</span>
+      <strong>${escapeHTML(value)}</strong>
     </div>
   `;
+
 }
+
 
 function tags(game) {
 
@@ -123,15 +130,96 @@ function tags(game) {
   return values
     .map(
       tag =>
-        `<span class="game-tag">${escapeHTML(tag)}</span>`
+        `<span class="game-tag">
+          ${escapeHTML(tag)}
+        </span>`
     )
     .join("");
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Convert Decap CMS format
+|--------------------------------------------------------------------------
+*/
+
+function normalizeGame(game) {
+
+  return {
+
+    ...game,
+
+    id:
+      game.slug ||
+      game.id,
+
+    size:
+      game.size_gb ||
+      game.size ||
+      "",
+
+    download:
+      game.download_link ||
+      game.download ||
+      "",
+
+    emulatorLink:
+      game.emulator_link ||
+      "",
+
+    releaseYear:
+      game.release_year ||
+      game.releaseYear ||
+      "",
+
+    requirements: {
+
+      minRam:
+        game.min_ram ||
+        "",
+
+      recommendedRam:
+        game.recommended_ram ||
+        "",
+
+      gpu:
+        game.gpu ||
+        "",
+
+      android:
+        game.android_support ||
+        "",
+
+      vulkan:
+        game.vulkan_required === true
+
+    },
+
+    features: {
+
+      offline:
+        game.offline === true,
+
+      controller:
+        game.controller_support === true,
+
+      multiplayer:
+        game.multiplayer === true
+
+    }
+
+  };
+
+}
+
 
 function renderGame(game) {
 
   document.title =
     `${game.title} — Gaming Hood`;
+
 
   const requirements =
     game.requirements || {};
@@ -139,12 +227,8 @@ function renderGame(game) {
   const features =
     game.features || {};
 
-  const gameContent =
-    $("#gameContent");
 
-  if (!gameContent) return;
-
-  gameContent.innerHTML = `
+  $("#gameContent").innerHTML = `
 
     <nav class="breadcrumbs">
 
@@ -154,11 +238,9 @@ function renderGame(game) {
 
       <span>»</span>
 
-      <a
-        href="category.html?platform=${encodeURIComponent(
-          game.platform || "Other"
-        )}"
-      >
+      <a href="category.html?platform=${encodeURIComponent(
+        game.platform || "Other"
+      )}">
         ${escapeHTML(
           game.platform || "Other"
         )}
@@ -172,13 +254,16 @@ function renderGame(game) {
 
     </nav>
 
+
     <div class="game-tags">
       ${tags(game)}
     </div>
 
+
     <h1 class="game-title">
       ${escapeHTML(game.title)}
     </h1>
+
 
     <div class="game-meta">
 
@@ -204,9 +289,7 @@ function renderGame(game) {
         game.views
           ? `
             <span>•</span>
-
             <span>
-              🔥
               ${escapeHTML(
                 Number(
                   game.views
@@ -220,9 +303,16 @@ function renderGame(game) {
 
     </div>
 
+
     <div class="game-hero-image">
-      ${gameImage(game, true)}
+
+      ${gameImage(
+        game,
+        true
+      )}
+
     </div>
+
 
     <section class="game-card-section">
 
@@ -238,6 +328,7 @@ function renderGame(game) {
       </p>
 
     </section>
+
 
     <section class="game-card-section">
 
@@ -260,8 +351,7 @@ function renderGame(game) {
 
         ${infoRow(
           "Game Size",
-          game.size ||
-          game.size_gb
+          game.size
         )}
 
         ${infoRow(
@@ -271,36 +361,34 @@ function renderGame(game) {
 
         ${infoRow(
           "Release Year",
-          game.releaseYear ||
-          game.release_year
+          game.releaseYear
         )}
 
         ${infoRow(
           "Offline",
-          features.offline === true
+          features.offline
             ? "Yes"
-            : features.offline === false
-              ? "No"
-              : ""
+            : "No"
         )}
 
         ${infoRow(
           "Controller",
           features.controller
             ? "Supported"
-            : ""
+            : "Not specified"
         )}
 
         ${infoRow(
           "Multiplayer",
           features.multiplayer
             ? "Supported"
-            : ""
+            : "Not supported"
         )}
 
       </div>
 
     </section>
+
 
     <section class="compat-card">
 
@@ -333,6 +421,7 @@ function renderGame(game) {
 
     </section>
 
+
     <section class="game-card-section">
 
       <h2>
@@ -357,39 +446,25 @@ function renderGame(game) {
 
         ${infoRow(
           "GPU",
-          requirements.gpu || ""
+          requirements.gpu
         )}
 
         ${infoRow(
           "Android",
-          requirements.android || ""
+          requirements.android
         )}
 
         ${infoRow(
           "Vulkan",
-          requirements.vulkan === true
+          game.vulkan_required === true
             ? "Required"
-            : requirements.vulkan === false
-              ? "Not required"
-              : ""
+            : "Not required"
         )}
 
       </div>
 
-      ${
-        Object.keys(
-          requirements
-        ).length === 0
-          ? `
-            <p class="muted">
-              Requirements will be added
-              for this game.
-            </p>
-          `
-          : ""
-      }
-
     </section>
+
 
     <section class="download-card">
 
@@ -407,14 +482,12 @@ function renderGame(game) {
       </p>
 
       ${
-        game.download ||
-        game.download_link
+        game.download
           ? `
             <a
               class="download-btn"
               href="${escapeHTML(
-                game.download ||
-                game.download_link
+                game.download
               )}"
               target="_blank"
               rel="noopener noreferrer"
@@ -434,6 +507,7 @@ function renderGame(game) {
 
     </section>
 
+
     <section class="game-card-section">
 
       <h2>
@@ -447,28 +521,28 @@ function renderGame(game) {
         </li>
 
         <li>
-          Extract the archive if it
-          is compressed.
+          Extract the archive if it is compressed.
         </li>
 
         <li>
-          Install or configure the
-          required emulator when applicable.
+          Install or configure the required
+          emulator when applicable.
         </li>
 
         <li>
-          Follow the game's
-          platform-specific setup instructions.
+          Follow the game's platform-specific
+          setup instructions.
         </li>
 
         <li>
-          Launch the game and adjust
-          settings if necessary.
+          Launch the game and adjust settings
+          if necessary.
         </li>
 
       </ol>
 
     </section>
+
 
     <section class="game-card-section share-section">
 
@@ -502,6 +576,7 @@ function renderGame(game) {
 
     </section>
 
+
     <section class="game-card-section">
 
       <div class="section-heading">
@@ -526,11 +601,16 @@ function renderGame(game) {
       ></div>
 
     </section>
+
   `;
 
+
   renderRelated(game);
+
   setupSharing(game);
+
 }
+
 
 function renderRelated(current) {
 
@@ -547,6 +627,7 @@ function renderRelated(current) {
         game: g,
 
         score:
+
           (
             g.platform ===
             current.platform
@@ -569,9 +650,9 @@ function renderRelated(current) {
           (
             (g.tags || [])
               .some(
-                tag =>
+                t =>
                   (current.tags || [])
-                    .includes(tag)
+                    .includes(t)
               )
               ? 1
               : 0
@@ -590,22 +671,16 @@ function renderRelated(current) {
         x => x.game
       );
 
-  const grid =
-    $("#relatedGrid");
 
-  if (!grid) return;
+  $("#relatedGrid").innerHTML =
 
-  grid.innerHTML =
     related
+
       .map(g => `
 
         <article class="game-card">
 
-          <a
-            href="game.html?id=${encodeURIComponent(
-              g.id
-            )}"
-          >
+          <a href="game.html?id=${encodeURIComponent(g.id)}">
 
             <div class="cover">
 
@@ -655,8 +730,11 @@ function renderRelated(current) {
         </article>
 
       `)
+
       .join("");
+
 }
+
 
 function setupSharing(game) {
 
@@ -668,6 +746,7 @@ function setupSharing(game) {
 
   const text =
     `Check out ${game.title} on Gaming Hood`;
+
 
   document
     .querySelectorAll(
@@ -681,6 +760,7 @@ function setupSharing(game) {
 
           const type =
             button.dataset.share;
+
 
           if (
             type === "native"
@@ -702,28 +782,19 @@ function setupSharing(game) {
 
             } else {
 
-              try {
+              await navigator.clipboard
+                ?.writeText(url);
 
-                await navigator
-                  .clipboard
-                  ?.writeText(url);
-
-                showToast(
-                  "Link copied"
-                );
-
-              } catch {
-
-                showToast(
-                  "Copy failed"
-                );
-
-              }
+              showToast(
+                "Link copied"
+              );
 
             }
 
             return;
+
           }
+
 
           if (
             type === "copy"
@@ -731,8 +802,7 @@ function setupSharing(game) {
 
             try {
 
-              await navigator
-                .clipboard
+              await navigator.clipboard
                 .writeText(url);
 
               showToast(
@@ -748,17 +818,18 @@ function setupSharing(game) {
             }
 
             return;
+
           }
 
+
           const encodedUrl =
-            encodeURIComponent(
-              url
-            );
+            encodeURIComponent(url);
 
           const encodedText =
             encodeURIComponent(
               `${text}\n${url}`
             );
+
 
           const links = {
 
@@ -766,14 +837,13 @@ function setupSharing(game) {
               `https://wa.me/?text=${encodedText}`,
 
             telegram:
-              `https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(
-                text
-              )}`,
+              `https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(text)}`,
 
             facebook:
               `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
 
           };
+
 
           if (
             links[type]
@@ -791,86 +861,67 @@ function setupSharing(game) {
       );
 
     });
+
 }
+
 
 function setupNavigation() {
 
-  const menuBtn =
-    $("#menuBtn");
+  const open = () => {
 
-  const closeDrawer =
-    $("#closeDrawer");
+    $("#drawer")
+      ?.classList.add("open");
 
-  const backdrop =
-    $("#drawerBackdrop");
+    $("#drawerBackdrop")
+      ?.classList.add("open");
 
-  menuBtn?.addEventListener(
-    "click",
-    () => {
+    $("#drawer")
+      ?.setAttribute(
+        "aria-hidden",
+        "false"
+      );
 
-      $("#drawer")
-        ?.classList.add(
-          "open"
-        );
+  };
 
-      backdrop
-        ?.classList.add(
-          "open"
-        );
 
-      $("#drawer")
-        ?.setAttribute(
-          "aria-hidden",
-          "false"
-        );
+  const close = () => {
 
-    }
-  );
+    $("#drawer")
+      ?.classList.remove("open");
 
-  closeDrawer?.addEventListener(
-    "click",
-    () => {
+    $("#drawerBackdrop")
+      ?.classList.remove("open");
 
-      $("#drawer")
-        ?.classList.remove(
-          "open"
-        );
+    $("#drawer")
+      ?.setAttribute(
+        "aria-hidden",
+        "true"
+      );
 
-      backdrop
-        ?.classList.remove(
-          "open"
-        );
+  };
 
-      $("#drawer")
-        ?.setAttribute(
-          "aria-hidden",
-          "true"
-        );
 
-    }
-  );
+  $("#menuBtn")
+    ?.addEventListener(
+      "click",
+      open
+    );
 
-  backdrop?.addEventListener(
-    "click",
-    () => {
+  $("#closeDrawer")
+    ?.addEventListener(
+      "click",
+      close
+    );
 
-      $("#drawer")
-        ?.classList.remove(
-          "open"
-        );
+  $("#drawerBackdrop")
+    ?.addEventListener(
+      "click",
+      close
+    );
 
-      backdrop
-        ?.classList.remove(
-          "open"
-        );
-
-    }
-  );
 
   document
-    .querySelectorAll(
-      ".nav-drop"
-    )
+    .querySelectorAll(".nav-drop")
     .forEach(button => {
 
       button.addEventListener(
@@ -882,7 +933,8 @@ function setupNavigation() {
               button.dataset.target
             );
 
-          if (!target) return;
+          if (!target)
+            return;
 
           target.classList.toggle(
             "open"
@@ -909,6 +961,7 @@ function setupNavigation() {
 
     });
 
+
   $("#drawerSearchForm")
     ?.addEventListener(
       "submit",
@@ -919,19 +972,18 @@ function setupNavigation() {
         const q =
           $("#drawerSearchInput")
             ?.value
-            .trim();
+            ?.trim();
 
         if (q) {
 
           location.href =
-            `./?search=${encodeURIComponent(
-              q
-            )}#games`;
+            `./?search=${encodeURIComponent(q)}#games`;
 
         }
 
       }
     );
+
 
   $("#randomBtn")
     ?.addEventListener(
@@ -950,59 +1002,71 @@ function setupNavigation() {
           ];
 
         location.href =
-          `game.html?id=${encodeURIComponent(
-            random.id
-          )}`;
+          `game.html?id=${encodeURIComponent(random.id)}`;
 
       }
     );
+
 }
+
 
 async function init() {
 
   setupNavigation();
 
+
   try {
 
     /*
-     * NEW DECAP CMS DATABASE
-     *
-     * games.json is located in
-     * the root of the repository.
+     * Cache-busting is intentional.
      */
+
     const response =
       await fetch(
-        "./games.json",
+        `games.json?v=${Date.now()}`,
         {
-          cache: "no-cache"
+          cache: "no-store"
         }
       );
+
 
     if (!response.ok) {
 
       throw new Error(
-        `Database unavailable (${response.status})`
+        "Database unavailable"
       );
 
     }
 
+
     const data =
       await response.json();
 
+
     games =
       Array.isArray(data.games)
-        ? data.games
+        ? data.games.map(
+            normalizeGame
+          )
         : [];
+
+
+    console.log(
+      "Gaming Hood games:",
+      games
+    );
+
 
     const id =
       getGameId();
 
+
     const game =
       games.find(
         item =>
-          item.id === id ||
-          item.slug === id
+          item.id === id
       );
+
 
     if (!game) {
 
@@ -1032,13 +1096,17 @@ async function init() {
       `;
 
       return;
+
     }
 
+
     renderGame(game);
+
 
   } catch (error) {
 
     console.error(error);
+
 
     $("#gameContent").innerHTML = `
 
@@ -1066,6 +1134,7 @@ async function init() {
 
   }
 
+
   if (
     "serviceWorker" in navigator
   ) {
@@ -1079,6 +1148,8 @@ async function init() {
       );
 
   }
+
 }
+
 
 init();
