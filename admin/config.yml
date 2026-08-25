@@ -2,6 +2,8 @@ backend:
   name: github
   repo: haisboy4/Gaming-Hood-Tz
   branch: main
+  site_domain: gaminghoodtz.netlify.app
+
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
@@ -13,7 +15,7 @@ collections:
 
     files:
 
-      - file: "games.json"
+      - file: "data/games.json"
         label: "Game Database"
         name: "games"
         format: "json"
@@ -23,19 +25,19 @@ collections:
           - label: "Games"
             name: "games"
             widget: "list"
-
             summary: "{{fields.title}}"
+            add_to_top: true
 
             fields:
+
+              - label: "Game ID"
+                name: "id"
+                widget: "string"
+                hint: "Example: ufc-5"
 
               - label: "Game Title"
                 name: "title"
                 widget: "string"
-
-              - label: "Slug"
-                name: "slug"
-                widget: "string"
-                hint: "Example: hollowbody"
 
               - label: "Platform"
                 name: "platform"
@@ -54,29 +56,13 @@ collections:
                 widget: "string"
                 required: false
 
-              - label: "Genre"
-                name: "genre"
-                widget: "list"
-                field:
-                  label: "Genre"
-                  name: "genre"
-                  widget: "string"
-
               - label: "Game Image"
                 name: "image"
                 widget: "image"
-
-              - label: "Description"
-                name: "description"
-                widget: "text"
-
-              - label: "Release Year"
-                name: "release_year"
-                widget: "number"
                 required: false
 
               - label: "Game Size"
-                name: "size_gb"
+                name: "size"
                 widget: "string"
                 required: false
 
@@ -85,64 +71,9 @@ collections:
                 widget: "string"
                 required: false
 
-              - label: "Minimum RAM"
-                name: "min_ram"
-                widget: "string"
-                required: false
-
-              - label: "Recommended RAM"
-                name: "recommended_ram"
-                widget: "string"
-                required: false
-
-              - label: "GPU Requirement"
-                name: "gpu"
-                widget: "string"
-                required: false
-
-              - label: "Offline"
-                name: "offline"
-                widget: "boolean"
-                default: true
-
-              - label: "Controller Supported"
-                name: "controller_support"
-                widget: "boolean"
-                default: false
-
-              - label: "Vulkan Required"
-                name: "vulkan_required"
-                widget: "boolean"
-                default: false
-
-              - label: "Android Version"
-                name: "android_support"
-                widget: "string"
-                required: false
-
-              - label: "FPS - Low"
-                name: "fps_low"
-                widget: "string"
-                required: false
-
-              - label: "FPS - Medium"
-                name: "fps_mid"
-                widget: "string"
-                required: false
-
-              - label: "FPS - High"
-                name: "fps_high"
-                widget: "string"
-                required: false
-
-              - label: "Download Link"
-                name: "download_link"
-                widget: "string"
-
-              - label: "Emulator Download Link"
-                name: "emulator_link"
-                widget: "string"
-                required: false
+              - label: "Description"
+                name: "description"
+                widget: "text"
 
               - label: "Tags"
                 name: "tags"
@@ -152,3 +83,77 @@ collections:
                   label: "Tag"
                   name: "tag"
                   widget: "string"
+
+              - label: "Release Year"
+                name: "releaseYear"
+                widget: "number"
+                required: false
+
+              - label: "Views"
+                name: "views"
+                widget: "number"
+                default: 0
+
+              - label: "Added Date"
+                name: "added"
+                widget: "date"
+                format: "YYYY-MM-DD"
+                required: false
+
+              - label: "Requirements"
+                name: "requirements"
+                widget: "object"
+                collapsed: true
+                fields:
+
+                  - label: "Minimum RAM"
+                    name: "minRam"
+                    widget: "number"
+                    required: false
+
+                  - label: "Recommended RAM"
+                    name: "recommendedRam"
+                    widget: "number"
+                    required: false
+
+                  - label: "GPU"
+                    name: "gpu"
+                    widget: "string"
+                    required: false
+
+                  - label: "Android Version"
+                    name: "android"
+                    widget: "string"
+                    required: false
+
+                  - label: "Vulkan Required"
+                    name: "vulkan"
+                    widget: "boolean"
+                    default: false
+                    required: false
+
+              - label: "Features"
+                name: "features"
+                widget: "object"
+                collapsed: true
+                fields:
+
+                  - label: "Offline"
+                    name: "offline"
+                    widget: "boolean"
+                    default: true
+
+                  - label: "Controller Supported"
+                    name: "controller"
+                    widget: "boolean"
+                    default: false
+
+                  - label: "Multiplayer"
+                    name: "multiplayer"
+                    widget: "boolean"
+                    default: false
+
+              - label: "Download Link"
+                name: "download"
+                widget: "string"
+                required: false
