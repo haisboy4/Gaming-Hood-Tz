@@ -1,1 +1,174 @@
-
+[
+  {
+    "id": "hollowbody",
+    "title": "Hollowbody",
+    "platform": "PC",
+    "emulator": "",
+    "image": "",
+    "size": "PC",
+    "build": "Build 21621978",
+    "description": "A survival horror game set in a decaying exclusion zone.",
+    "tags": [
+      "Horror",
+      "Adventure",
+      "Indie"
+    ],
+    "views": 22275,
+    "added": "2026-08-25",
+    "releaseYear": 2024,
+    "requirements": {
+      "minRam": 4,
+      "recommendedRam": 8,
+      "gpu": "Dedicated GPU recommended"
+    },
+    "features": {
+      "offline": true,
+      "controller": true,
+      "multiplayer": false
+    },
+    "download": ""
+  },
+  {
+    "id": "ravens-story",
+    "title": "Raven's Story",
+    "platform": "PC",
+    "emulator": "",
+    "image": "",
+    "size": "PC",
+    "build": "Build 20906491",
+    "description": "An indie adventure featuring a mysterious raven and a strange world.",
+    "tags": [
+      "Adventure",
+      "Indie"
+    ],
+    "views": 18200,
+    "added": "2026-08-24",
+    "releaseYear": 2026,
+    "requirements": {
+      "minRam": 4,
+      "recommendedRam": 8,
+      "gpu": "Modern GPU"
+    },
+    "features": {
+      "offline": true,
+      "controller": true,
+      "multiplayer": false
+    },
+    "download": ""
+  },
+  {
+    "id": "undead-west",
+    "title": "Undead West",
+    "platform": "PC",
+    "emulator": "",
+    "image": "",
+    "size": "PC",
+    "build": "Build 24706823",
+    "description": "A stylized western adventure with undead enemies.",
+    "tags": [
+      "Action",
+      "Indie"
+    ],
+    "views": 15400,
+    "added": "2026-08-23",
+    "releaseYear": 2026,
+    "requirements": {
+      "minRam": 4,
+      "recommendedRam": 8,
+      "gpu": "Modern GPU"
+    },
+    "features": {
+      "offline": true,
+      "controller": true,
+      "multiplayer": false
+    },
+    "download": ""
+  },
+  {
+    "id": "9-keys",
+    "title": "9 Keys",
+    "platform": "PC",
+    "emulator": "",
+    "image": "",
+    "size": "PC",
+    "build": "Build 18961968",
+    "description": "An atmospheric adventure with exploration and mystery.",
+    "tags": [
+      "Adventure",
+      "Indie"
+    ],
+    "views": 12100,
+    "added": "2026-08-22",
+    "releaseYear": 2026,
+    "requirements": {
+      "minRam": 4,
+      "recommendedRam": 8,
+      "gpu": "Modern GPU"
+    },
+    "features": {
+      "offline": true,
+      "controller": true,
+      "multiplayer": false
+    },
+    "download": ""
+  },
+  {
+    "id": "call-of-duty-black-ops",
+    "title": "Call of Duty: Black Ops",
+    "platform": "PC",
+    "emulator": "Winlator",
+    "image": "",
+    "size": "8.2 GB",
+    "build": "",
+    "description": "Placeholder entry for the Gaming Hood compatibility system.",
+    "tags": [
+      "Shooter",
+      "Action",
+      "Winlator"
+    ],
+    "views": 9800,
+    "added": "2026-08-20",
+    "releaseYear": 2010,
+    "requirements": {
+      "minRam": 4,
+      "recommendedRam": 6,
+      "gpu": "Adreno 630 / equivalent",
+      "android": "9+",
+      "vulkan": true
+    },
+    "features": {
+      "offline": true,
+      "controller": true,
+      "multiplayer": true
+    },
+    "download": ""
+  },
+  {
+    "id": "sample-android-game",
+    "title": "Android Game Example",
+    "platform": "Android",
+    "emulator": "",
+    "image": "",
+    "size": "2.4 GB",
+    "build": "",
+    "description": "Example database record. Replace this with your actual game.",
+    "tags": [
+      "Android"
+    ],
+    "views": 7600,
+    "added": "2026-08-18",
+    "releaseYear": 2026,
+    "requirements": {
+      "minRam": 3,
+      "recommendedRam": 4,
+      "gpu": "Adreno 5xx / Mali equivalent",
+      "android": "8+"
+    },
+    "features": {
+      "offline": true,
+      "controller": false,
+      "multiplayer": false
+    },
+    "download": ""
+  }
+]
