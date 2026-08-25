@@ -2,6 +2,7 @@ backend:
   name: github
   repo: haisboy4/Gaming-Hood-Tz
   branch: main
+  site_domain: gaminghoodtz.netlify.app
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
