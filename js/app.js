@@ -17,7 +17,6 @@ function escapeHTML(value = "") {
 
 function showToast(message) {
   const toast = $("#toast");
-
   if (!toast) return;
 
   toast.textContent = message;
@@ -33,15 +32,12 @@ function showToast(message) {
 function skeletons(target, count = 4) {
   if (!target) return;
 
-  target.innerHTML = Array.from(
-    { length: count },
-    () => `
-      <article class="game-card">
-        <div class="skeleton skeleton-cover"></div>
-        <div class="skeleton skeleton-info"></div>
-      </article>
-    `
-  ).join("");
+  target.innerHTML = Array.from({ length: count }, () => `
+    <article class="game-card">
+      <div class="skeleton skeleton-cover"></div>
+      <div class="skeleton skeleton-info"></div>
+    </article>
+  `).join("");
 }
 
 function gameCard(game) {
@@ -75,7 +71,6 @@ function gameCard(game) {
 
   return `
     <article class="game-card">
-
       <a
         href="game.html?id=${encodeURIComponent(game.id)}"
         aria-label="Open ${title}"
@@ -116,12 +111,11 @@ function gameCard(game) {
             tags.length
               ? `
                 <div class="card-tags">
-                  ${tags
-                    .map(
-                      tag =>
-                        `<span class="tag">${escapeHTML(tag)}</span>`
-                    )
-                    .join("")}
+                  ${tags.map(tag => `
+                    <span class="tag">
+                      ${escapeHTML(tag)}
+                    </span>
+                  `).join("")}
                 </div>
               `
               : ""
@@ -130,7 +124,6 @@ function gameCard(game) {
         </div>
 
       </a>
-
     </article>
   `;
 }
@@ -143,74 +136,163 @@ function renderGrid(target, games) {
     : "";
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Convert Decap CMS JSON → Website format
+|--------------------------------------------------------------------------
+*/
+
 function normalizeGames(data) {
-  if (!Array.isArray(data)) return [];
 
-  return data.map((game, index) => ({
-    id: game.id || game.slug || `game-${index + 1}`,
+  return data.map((game, index) => {
 
-    title:
-      game.title ||
-      "Untitled Game",
+    return {
 
-    platform:
-      game.platform ||
-      "Other",
+      id:
+        game.slug ||
+        game.id ||
+        `game-${index + 1}`,
 
-    emulator:
-      game.emulator ||
-      "",
+      title:
+        game.title ||
+        "Untitled Game",
 
-    image:
-      game.image ||
-      "",
+      platform:
+        game.platform ||
+        "Other",
 
-    size:
-      game.size ||
-      game.size_gb ||
-      "",
+      emulator:
+        game.emulator ||
+        "",
 
-    build:
-      game.build ||
-      "",
+      image:
+        game.image ||
+        "",
 
-    description:
-      game.description ||
-      "",
+      /*
+       * Decap:
+       * size_gb
+       *
+       * Website:
+       * size
+       */
+      size:
+        game.size_gb ||
+        game.size ||
+        "",
 
-    tags:
-      Array.isArray(game.tags)
-        ? game.tags
-        : [],
+      build:
+        game.build ||
+        "",
 
-    views:
-      Number(game.views || 0),
+      description:
+        game.description ||
+        "",
 
-    added:
-      game.added ||
-      "",
+      tags:
+        Array.isArray(game.tags)
+          ? game.tags
+          : [],
 
-    releaseYear:
-      game.releaseYear ||
-      game.release_year ||
-      "",
+      genre:
+        Array.isArray(game.genre)
+          ? game.genre
+          : [],
 
-    requirements:
-      game.requirements ||
-      {},
+      views:
+        Number(game.views || 0),
 
-    features:
-      game.features ||
-      {},
+      added:
+        game.added ||
+        "",
 
-    download:
-      game.download ||
-      game.download_link ||
-      ""
-  }));
+      /*
+       * Convert Decap field names
+       */
+
+      releaseYear:
+        game.release_year ||
+        game.releaseYear ||
+        "",
+
+      download:
+        game.download_link ||
+        game.download ||
+        "",
+
+      emulatorLink:
+        game.emulator_link ||
+        game.emulatorLink ||
+        "",
+
+      requirements: {
+
+        minRam:
+          game.min_ram ||
+          "",
+
+        recommendedRam:
+          game.recommended_ram ||
+          "",
+
+        gpu:
+          game.gpu ||
+          "",
+
+        android:
+          game.android_support ||
+          "",
+
+        vulkan:
+          game.vulkan_required === true
+
+      },
+
+      features: {
+
+        offline:
+          game.offline === true,
+
+        controller:
+          game.controller_support === true,
+
+        multiplayer:
+          game.multiplayer === true
+
+      },
+
+      fps: {
+
+        low:
+          game.fps_low ||
+          "",
+
+        medium:
+          game.fps_mid ||
+          "",
+
+        high:
+          game.fps_high ||
+          ""
+
+      }
+
+    };
+
+  });
+
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Load games
+|--------------------------------------------------------------------------
+*/
+
 async function loadGames() {
+
   const recent = $("#recentGrid");
   const top = $("#topGrid");
   const all = $("#allGrid");
@@ -222,15 +304,15 @@ async function loadGames() {
   try {
 
     /*
-     * NEW DECAP CMS DATABASE
-     *
-     * games.json is now located at the
-     * root of the GitHub repository.
+     * IMPORTANT:
+     * cache-busting prevents an old games.json
+     * from being reused.
      */
+
     const response = await fetch(
-      "./games.json",
+      `games.json?v=${Date.now()}`,
       {
-        cache: "no-cache"
+        cache: "no-store"
       }
     );
 
@@ -242,20 +324,22 @@ async function loadGames() {
 
     const data = await response.json();
 
+    console.log("Gaming Hood database:", data);
+
     state.games = normalizeGames(
-      data.games || []
+      Array.isArray(data.games)
+        ? data.games
+        : []
     );
 
-    state.filtered = [
-      ...state.games
-    ];
+    state.filtered = [...state.games];
 
     renderHome();
 
   } catch (error) {
 
     console.error(
-      "Game database error:",
+      "Gaming Hood database error:",
       error
     );
 
@@ -276,11 +360,16 @@ async function loadGames() {
   }
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Homepage
+|--------------------------------------------------------------------------
+*/
+
 function renderHome() {
 
-  const newest = [
-    ...state.games
-  ]
+  const newest = [...state.games]
     .sort(
       (a, b) =>
         new Date(b.added || 0) -
@@ -288,9 +377,7 @@ function renderHome() {
     )
     .slice(0, 8);
 
-  const top = [
-    ...state.games
-  ]
+  const top = [...state.games]
     .sort(
       (a, b) =>
         b.views - a.views
@@ -312,26 +399,16 @@ function renderHome() {
     state.filtered
   );
 
-  const resultCount =
-    $("#resultCount");
+  updateResultCount();
 
-  if (resultCount) {
-    resultCount.textContent =
-      `${state.filtered.length} game${
-        state.filtered.length === 1
-          ? ""
-          : "s"
-      }`;
-  }
-
-  const emptyState =
-    $("#emptyState");
-
-  if (emptyState) {
-    emptyState.hidden =
-      state.filtered.length !== 0;
-  }
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Search
+|--------------------------------------------------------------------------
+*/
 
 function filterGames(query) {
 
@@ -340,49 +417,35 @@ function filterGames(query) {
       .trim()
       .toLowerCase();
 
-  state.filtered = !q
-    ? [...state.games]
-    : state.games.filter(
-        game => {
+  state.filtered =
+    !q
+      ? [...state.games]
+      : state.games.filter(game => {
 
           const haystack = [
+
             game.title,
             game.platform,
             game.emulator,
             game.description,
-            ...(game.tags || [])
+
+            ...(game.tags || []),
+            ...(game.genre || [])
+
           ]
-            .join(" ")
-            .toLowerCase();
+          .join(" ")
+          .toLowerCase();
 
           return haystack.includes(q);
-        }
-      );
+
+        });
 
   renderGrid(
     $("#allGrid"),
     state.filtered
   );
 
-  const resultCount =
-    $("#resultCount");
-
-  if (resultCount) {
-    resultCount.textContent =
-      `${state.filtered.length} game${
-        state.filtered.length === 1
-          ? ""
-          : "s"
-      }`;
-  }
-
-  const emptyState =
-    $("#emptyState");
-
-  if (emptyState) {
-    emptyState.hidden =
-      state.filtered.length !== 0;
-  }
+  updateResultCount();
 
   document
     .querySelector("#games")
@@ -392,48 +455,87 @@ function filterGames(query) {
     });
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Result counter
+|--------------------------------------------------------------------------
+*/
+
+function updateResultCount() {
+
+  const count =
+    state.filtered.length;
+
+  const resultCount =
+    $("#resultCount");
+
+  if (resultCount) {
+
+    resultCount.textContent =
+      `${count} game${count === 1 ? "" : "s"}`;
+
+  }
+
+  const empty =
+    $("#emptyState");
+
+  if (empty) {
+
+    empty.hidden =
+      count !== 0;
+
+  }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Navigation
+|--------------------------------------------------------------------------
+*/
+
 function openDrawer() {
 
-  const drawer = $("#drawer");
-  const backdrop =
-    $("#drawerBackdrop");
-  const menuBtn =
-    $("#menuBtn");
+  $("#drawer")
+    ?.classList.add("open");
 
-  drawer?.classList.add("open");
-  backdrop?.classList.add("open");
+  $("#drawerBackdrop")
+    ?.classList.add("open");
 
-  drawer?.setAttribute(
-    "aria-hidden",
-    "false"
-  );
+  $("#drawer")
+    ?.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-  menuBtn?.setAttribute(
-    "aria-expanded",
-    "true"
-  );
+  $("#menuBtn")
+    ?.setAttribute(
+      "aria-expanded",
+      "true"
+    );
 }
 
 function closeDrawer() {
 
-  const drawer = $("#drawer");
-  const backdrop =
-    $("#drawerBackdrop");
-  const menuBtn =
-    $("#menuBtn");
+  $("#drawer")
+    ?.classList.remove("open");
 
-  drawer?.classList.remove("open");
-  backdrop?.classList.remove("open");
+  $("#drawerBackdrop")
+    ?.classList.remove("open");
 
-  drawer?.setAttribute(
-    "aria-hidden",
-    "true"
-  );
+  $("#drawer")
+    ?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-  menuBtn?.setAttribute(
-    "aria-expanded",
-    "false"
-  );
+  $("#menuBtn")
+    ?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 }
 
 function setupNavigation() {
@@ -456,6 +558,7 @@ function setupNavigation() {
       closeDrawer
     );
 
+
   document
     .querySelectorAll(".nav-drop")
     .forEach(button => {
@@ -476,21 +579,22 @@ function setupNavigation() {
           );
 
           const span =
-            button.querySelector(
-              "span"
-            );
+            button.querySelector("span");
 
           if (span) {
+
             span.textContent =
-              target.classList.contains(
-                "open"
-              )
+              target.classList.contains("open")
                 ? "⌃"
                 : "⌄";
+
           }
+
         }
       );
+
     });
+
 
   document
     .querySelectorAll(".drawer a")
@@ -505,12 +609,16 @@ function setupNavigation() {
               "nav-drop"
             )
           ) {
+
             closeDrawer();
+
           }
 
         }
       );
+
     });
+
 
   $("#searchBtn")
     ?.addEventListener(
@@ -527,6 +635,7 @@ function setupNavigation() {
 
       }
     );
+
 
   $("#randomBtn")
     ?.addEventListener(
@@ -545,29 +654,24 @@ function setupNavigation() {
           ];
 
         window.location.href =
-          `game.html?id=${encodeURIComponent(
-            game.id
-          )}`;
+          `game.html?id=${encodeURIComponent(game.id)}`;
 
       }
     );
+
 
   $("#heroSearchBtn")
     ?.addEventListener(
       "click",
       () => {
 
-        const input =
-          $("#heroSearchInput");
-
-        if (input) {
-          filterGames(
-            input.value
-          );
-        }
+        filterGames(
+          $("#heroSearchInput")?.value || ""
+        );
 
       }
     );
+
 
   $("#heroSearchInput")
     ?.addEventListener(
@@ -577,67 +681,29 @@ function setupNavigation() {
         if (
           event.key === "Enter"
         ) {
+
           filterGames(
             event.target.value
           );
+
         }
 
       }
     );
+
 
   $("#librarySearchInput")
     ?.addEventListener(
       "input",
       event => {
 
-        const q =
+        filterGames(
           event.target.value
-            .trim()
-            .toLowerCase();
-
-        state.filtered = !q
-          ? [...state.games]
-          : state.games.filter(
-              game =>
-                [
-                  game.title,
-                  game.platform,
-                  game.emulator,
-                  game.description,
-                  ...(game.tags || [])
-                ]
-                  .join(" ")
-                  .toLowerCase()
-                  .includes(q)
-            );
-
-        renderGrid(
-          $("#allGrid"),
-          state.filtered
         );
-
-        const resultCount =
-          $("#resultCount");
-
-        if (resultCount) {
-          resultCount.textContent =
-            `${state.filtered.length} game${
-              state.filtered.length === 1
-                ? ""
-                : "s"
-            }`;
-        }
-
-        const emptyState =
-          $("#emptyState");
-
-        if (emptyState) {
-          emptyState.hidden =
-            state.filtered.length !== 0;
-        }
 
       }
     );
+
 
   $("#drawerSearchForm")
     ?.addEventListener(
@@ -648,18 +714,22 @@ function setupNavigation() {
 
         closeDrawer();
 
-        const input =
-          $("#drawerSearchInput");
-
-        if (input) {
-          filterGames(
-            input.value
-          );
-        }
+        filterGames(
+          $("#drawerSearchInput")
+            ?.value || ""
+        );
 
       }
     );
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| PWA
+|--------------------------------------------------------------------------
+*/
 
 function setupPWA() {
 
@@ -687,14 +757,24 @@ function setupPWA() {
     );
 
   }
+
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Start
+|--------------------------------------------------------------------------
+*/
 
 const year =
   $("#year");
 
 if (year) {
+
   year.textContent =
     new Date().getFullYear();
+
 }
 
 setupNavigation();
