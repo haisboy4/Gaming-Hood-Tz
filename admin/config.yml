@@ -1,1 +1,135 @@
+backend:
+  name: github
+  repo: haisboy4/Gaminghoodstore-
+  branch: main
+  # Netlify can provide the server-side OAuth helper for the GitHub backend.
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
 
+site_url: https://haisboy4.github.io/Gaminghoodstore-
+
+media_folder: "assets/uploads"
+public_folder: "/Gaminghoodstore-/assets/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: "games"
+    label: "Games"
+    label_singular: "Game"
+    folder: "data/games"
+    create: true
+    extension: "json"
+    format: "json"
+    identifier_field: "id"
+    slug: "{{id}}"
+    summary: "{{title}} — {{platform}}"
+    fields:
+      - label: "Game ID"
+        name: "id"
+        widget: "string"
+        hint: "Unique lowercase ID, e.g. call-of-duty-black-ops"
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Platform"
+        name: "platform"
+        widget: "select"
+        options: ["Android", "PC", "Winlator", "PSP", "PS Vita", "PS2", "Wii", "GameCube", "Other"]
+      - label: "Emulator"
+        name: "emulator"
+        widget: "string"
+        required: false
+      - label: "Genre / Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        field:
+          label: "Tag"
+          name: "tag"
+          widget: "string"
+      - label: "Game Image"
+        name: "image"
+        widget: "image"
+        required: false
+        choose_url: true
+      - label: "Game Size"
+        name: "size"
+        widget: "string"
+        required: false
+      - label: "Build / Version"
+        name: "build"
+        widget: "string"
+        required: false
+      - label: "Description"
+        name: "description"
+        widget: "richtext"
+        required: false
+      - label: "Release Year"
+        name: "releaseYear"
+        widget: "number"
+        value_type: "int"
+        required: false
+      - label: "Date Added"
+        name: "added"
+        widget: "date"
+        required: false
+        format: "YYYY-MM-DD"
+      - label: "Views"
+        name: "views"
+        widget: "number"
+        value_type: "int"
+        default: 0
+        required: false
+      - label: "Download Link"
+        name: "download"
+        widget: "string"
+        required: false
+      - label: "Requirements"
+        name: "requirements"
+        widget: "object"
+        required: false
+        fields:
+          - label: "Minimum RAM (GB)"
+            name: "minRam"
+            widget: "number"
+            value_type: "int"
+            required: false
+          - label: "Recommended RAM (GB)"
+            name: "recommendedRam"
+            widget: "number"
+            value_type: "int"
+            required: false
+          - label: "GPU"
+            name: "gpu"
+            widget: "string"
+            required: false
+          - label: "Android Version"
+            name: "android"
+            widget: "string"
+            required: false
+          - label: "Vulkan Required"
+            name: "vulkan"
+            widget: "boolean"
+            default: false
+            required: false
+      - label: "Features"
+        name: "features"
+        widget: "object"
+        required: false
+        fields:
+          - label: "Offline"
+            name: "offline"
+            widget: "boolean"
+            default: false
+            required: false
+          - label: "Controller Support"
+            name: "controller"
+            widget: "boolean"
+            default: false
+            required: false
+          - label: "Multiplayer"
+            name: "multiplayer"
+            widget: "boolean"
+            default: false
+            required: false
