@@ -1,0 +1,159 @@
+backend:
+  name: github
+  repo: haisboy4/Gaming-Hood-Tz
+  branch: main
+  site_domain: gaminghoodtz.netlify.app
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+
+  - name: "games"
+    label: "Games"
+    label_singular: "Game"
+
+    files:
+
+      - file: "data/games.json"
+        label: "Game Database"
+        name: "games"
+        format: "json"
+
+        fields:
+
+          - label: "Games"
+            name: "games"
+            widget: "list"
+            summary: "{{fields.title}}"
+            add_to_top: true
+
+            fields:
+
+              - label: "Game ID"
+                name: "id"
+                widget: "string"
+                hint: "Example: ufc-5"
+
+              - label: "Game Title"
+                name: "title"
+                widget: "string"
+
+              - label: "Platform"
+                name: "platform"
+                widget: "select"
+                options:
+                  - "Android"
+                  - "PC"
+                  - "PSP"
+                  - "PS Vita"
+                  - "Nintendo Wii"
+                  - "GameCube"
+                  - "Other"
+
+              - label: "Emulator"
+                name: "emulator"
+                widget: "string"
+                required: false
+
+              - label: "Game Image"
+                name: "image"
+                widget: "image"
+                required: false
+
+              - label: "Game Size"
+                name: "size"
+                widget: "string"
+                required: false
+
+              - label: "Build"
+                name: "build"
+                widget: "string"
+                required: false
+
+              - label: "Description"
+                name: "description"
+                widget: "text"
+
+              - label: "Tags"
+                name: "tags"
+                widget: "list"
+                required: false
+                field:
+                  label: "Tag"
+                  name: "tag"
+                  widget: "string"
+
+              - label: "Release Year"
+                name: "releaseYear"
+                widget: "number"
+                required: false
+
+              - label: "Views"
+                name: "views"
+                widget: "number"
+                default: 0
+
+              - label: "Added Date"
+                name: "added"
+                widget: "date"
+                format: "YYYY-MM-DD"
+                required: false
+
+              - label: "Requirements"
+                name: "requirements"
+                widget: "object"
+                collapsed: true
+                fields:
+
+                  - label: "Minimum RAM"
+                    name: "minRam"
+                    widget: "number"
+                    required: false
+
+                  - label: "Recommended RAM"
+                    name: "recommendedRam"
+                    widget: "number"
+                    required: false
+
+                  - label: "GPU"
+                    name: "gpu"
+                    widget: "string"
+                    required: false
+
+                  - label: "Android Version"
+                    name: "android"
+                    widget: "string"
+                    required: false
+
+                  - label: "Vulkan Required"
+                    name: "vulkan"
+                    widget: "boolean"
+                    default: false
+                    required: false
+
+              - label: "Features"
+                name: "features"
+                widget: "object"
+                collapsed: true
+                fields:
+
+                  - label: "Offline"
+                    name: "offline"
+                    widget: "boolean"
+                    default: true
+
+                  - label: "Controller Supported"
+                    name: "controller"
+                    widget: "boolean"
+                    default: false
+
+                  - label: "Multiplayer"
+                    name: "multiplayer"
+                    widget: "boolean"
+                    default: false
+
+              - label: "Download Link"
+                name: "download"
+                widget: "string"
+                required: false
