@@ -232,3 +232,74 @@
   }
   .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* =========================================================
+   GAMING HOOD — GAME PAGE GREEN THEME
+========================================================= */
+:root {
+  --purple: #087f5b;
+  --purple-dark: #034c39;
+  --purple-soft: #ddf4ea;
+  --border: #dfe7e3;
+  --surface: #ffffff;
+  --surface-2: #f0f7f3;
+  --text: #151918;
+  --muted: #69736f;
+  --shadow: 0 10px 28px rgba(4,76,57,.08);
+}
+
+.breadcrumbs { color: #69736f; }
+.breadcrumbs a { color: #087f5b; }
+.game-tag {
+  color: #056044;
+  background: #ddf4ea;
+  border: 1px solid #ccebdd;
+}
+.game-meta { color: #69736f; }
+.game-hero-image {
+  background: #034c39;
+  box-shadow: var(--shadow);
+}
+.game-cover-placeholder {
+  background: linear-gradient(135deg, #034c39, #0b9169);
+}
+.game-card-section {
+  border-color: #dfe7e3;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(12,45,32,.05);
+}
+.game-description { color: #4e5954; }
+.info-grid, .requirements { border-color: #dfe7e3; background: #dfe7e3; }
+.info-row { background: #fff; }
+.info-row span { color: #69736f; }
+.compat-card {
+  color: #fff;
+  background: linear-gradient(120deg, #034c39, #087f5b);
+}
+.compat-card .section-kicker { color: #bcebd7; }
+.compat-card p:not(.section-kicker) { color: #d9f3e8; }
+.download-card {
+  color: #fff;
+  background: #034c39;
+}
+.download-card .section-kicker { color: #bcebd7; }
+.download-card p:not(.section-kicker) { color: #d9f3e8; }
+.download-btn {
+  color: #056044;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0,0,0,.10);
+}
+.download-btn:hover { background: #e8f8f0; }
+.share-buttons button {
+  border-color: #dfe7e3;
+  color: #151918;
+  background: #f0f7f3;
+}
+.share-buttons button:hover {
+  color: #fff;
+  border-color: #087f5b;
+  background: #087f5b;
+}
+.not-found { border-color: #dfe7e3; }
+.install-list { color: #4e5954; }
