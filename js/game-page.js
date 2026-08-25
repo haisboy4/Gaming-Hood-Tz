@@ -268,7 +268,8 @@ async function init() {
   try {
     const response = await fetch("data/games.json", { cache: "no-cache" });
     if (!response.ok) throw new Error("Database unavailable");
-    games = await response.json();
+    const data = await response.json();
+    games = data.games || [];
 
     const id = getGameId();
     const game = games.find(item => item.id === id);

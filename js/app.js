@@ -97,7 +97,7 @@ async function loadGames() {
     if (!response.ok) throw new Error("Could not load games");
     const data = await response.json();
 
-    state.games = normalizeGames(data);
+    state.games = normalizeGames(data.games || []);
     state.filtered = [...state.games];
 
     renderHome();
