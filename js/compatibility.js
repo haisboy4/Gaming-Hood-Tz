@@ -1,11 +1,10 @@
 /* =========================================================
    GAMING HOOD COMPATIBILITY SYSTEM
+   Version 2
 ========================================================= */
 
 let games = [];
-
 let selectedGame = null;
-
 let detectedDevice = null;
 
 
@@ -34,17 +33,14 @@ function escapeHTML(value = "") {
 
 
 /* =========================================================
-   GET GAME ID
+   GAME ID
 ========================================================= */
 
 function getGameId() {
 
-  const params =
-    new URLSearchParams(
-      location.search
-    );
-
-  return params.get("game");
+  return new URLSearchParams(
+    location.search
+  ).get("game");
 
 }
 
@@ -77,14 +73,10 @@ function normalizeGame(game) {
       "",
 
     minRam:
-      Number(
-        game.min_ram || 0
-      ),
+      Number(game.min_ram) || 0,
 
     recommendedRam:
-      Number(
-        game.recommended_ram || 0
-      ),
+      Number(game.recommended_ram) || 0,
 
     gpu:
       game.gpu ||
@@ -94,7 +86,7 @@ function normalizeGame(game) {
       game.android_support ||
       "",
 
-    vulkan:
+    vulkanRequired:
       game.vulkan_required === true,
 
     fpsLow:
@@ -115,6 +107,222 @@ function normalizeGame(game) {
 
 
 /* =========================================================
+   ANDROID VERSION
+========================================================= */
+
+function detectAndroidVersion() {
+
+  const ua =
+    navigator.userAgent || "";
+
+  const match =
+    ua.match(
+      /Android\s([0-9.]+)/i
+    );
+
+  return match
+    ? match[1]
+    : "Unknown";
+
+}
+
+
+/* =========================================================
+   DEVICE NAME DETECTION
+========================================================= */
+
+function detectDeviceName() {
+
+  const ua =
+    navigator.userAgent || "";
+
+
+  /*
+   * Samsung models
+   */
+
+  const samsungModels = {
+
+    "SM-G960":
+      "Samsung Galaxy S9",
+
+    "SM-G965":
+      "Samsung Galaxy S9+",
+
+    "SM-N950":
+      "Samsung Galaxy Note 8",
+
+    "SM-N960":
+      "Samsung Galaxy Note 9",
+
+    "SM-G950":
+      "Samsung Galaxy S8",
+
+    "SM-G955":
+      "Samsung Galaxy S8+",
+
+    "SM-G970":
+      "Samsung Galaxy S10e",
+
+    "SM-G973":
+      "Samsung Galaxy S10",
+
+    "SM-G975":
+      "Samsung Galaxy S10+"
+
+  };
+
+
+  for (
+    const model in samsungModels
+  ) {
+
+    if (
+      new RegExp(model, "i")
+        .test(ua)
+    ) {
+
+      return samsungModels[model];
+
+    }
+
+  }
+
+
+  /*
+   * Pixel
+   */
+
+  const pixel =
+    ua.match(
+      /;\s*(Pixel[^;)]+?)(?:\s+Build\/|[;)])/i
+    );
+
+  if (pixel) {
+
+    return pixel[1].trim();
+
+  }
+
+
+  /*
+   * Xiaomi / Redmi
+   */
+
+  const redmi =
+    ua.match(
+      /;\s*(Redmi[^;)]+?)(?:\s+Build\/|[;)])/i
+    );
+
+  if (redmi) {
+
+    return redmi[1].trim();
+
+  }
+
+
+  const xiaomi =
+    ua.match(
+      /;\s*(Xiaomi[^;)]+?)(?:\s+Build\/|[;)])/i
+    );
+
+  if (xiaomi) {
+
+    return xiaomi[1].trim();
+
+  }
+
+
+  /*
+   * OnePlus
+   */
+
+  const oneplus =
+    ua.match(
+      /;\s*(ONEPLUS[^;)]+?)(?:\s+Build\/|[;)])/i
+    );
+
+  if (oneplus) {
+
+    return oneplus[1].trim();
+
+  }
+
+
+  /*
+   * Generic Android model.
+   *
+   * Avoid returning things like:
+   * K
+   * wv
+   * Mobile
+   * Build
+   */
+
+  const match =
+    ua.match(
+      /Android[^;]*;\s*(?:[a-z]{2,3}(?:-[A-Z]{2})?;\s*)?([^;)]+?)(?:\s+Build\/[^;)]+)?[);]/i
+    );
+
+
+  if (
+    match &&
+    match[1]
+  ) {
+
+    const model =
+      match[1]
+        .trim();
+
+
+    if (
+      model.length >= 3 &&
+      !/^(k|wv|mobile|android)$/i.test(model) &&
+      !/^[a-z]$/i.test(model)
+    ) {
+
+      return model;
+
+    }
+
+  }
+
+
+  return "Android Device";
+
+}
+
+
+/* =========================================================
+   RAM DETECTION
+========================================================= */
+
+function detectRAM() {
+
+  /*
+   * navigator.deviceMemory does NOT necessarily expose
+   * the phone's physical RAM. Browsers intentionally
+   * round/cap the value.
+   */
+
+  if (
+    typeof navigator.deviceMemory ===
+    "number"
+  ) {
+
+    return Number(
+      navigator.deviceMemory
+    );
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =========================================================
    GPU DETECTION
 ========================================================= */
 
@@ -127,6 +335,7 @@ function detectGPU() {
         "canvas"
       );
 
+
     const gl =
       canvas.getContext(
         "webgl"
@@ -134,6 +343,7 @@ function detectGPU() {
       canvas.getContext(
         "experimental-webgl"
       );
+
 
     if (!gl) {
 
@@ -155,19 +365,29 @@ function detectGPU() {
           debugInfo.UNMASKED_RENDERER_WEBGL
         );
 
-      if (renderer) {
 
-        return renderer;
+      if (
+        renderer &&
+        renderer !== "WebKit WebGL"
+      ) {
+
+        return cleanGPUName(
+          renderer
+        );
 
       }
 
     }
 
 
-    return String(
+    const renderer =
       gl.getParameter(
         gl.RENDERER
-      ) ||
+      );
+
+
+    return cleanGPUName(
+      renderer ||
       "Unknown GPU"
     );
 
@@ -183,118 +403,61 @@ function detectGPU() {
 
 
 /* =========================================================
-   ANDROID VERSION
+   CLEAN GPU NAME
 ========================================================= */
 
-function detectAndroidVersion() {
+function cleanGPUName(
+  gpu = ""
+) {
 
-  const ua =
-    navigator.userAgent;
-
-  const match =
-    ua.match(
-      /Android\s([0-9.]+)/i
-    );
-
-  return match
-    ? match[1]
-    : "Unknown";
-
-}
-
-
-/* =========================================================
-   DEVICE MODEL
-========================================================= */
-
-function detectDeviceName() {
-
-  const ua =
-    navigator.userAgent;
+  let name =
+    String(gpu)
+      .trim();
 
 
   /*
-   * Android Chrome normally exposes
-   * the model in the User-Agent.
+   * Common Android ANGLE strings
    */
 
-  const match =
-    ua.match(
-      /Android[^;]*;\s*(?:[a-z]{2,3}(?:-[A-Z]{2})?;\s*)?([^;)]+?)(?:\s+Build\/[^;)]+)?[);]/i
+  name =
+    name.replace(
+      /^ANGLE\s*\(/i,
+      ""
     );
 
 
-  if (
-    match &&
-    match[1]
-  ) {
-
-    const model =
-      match[1].trim();
-
-    if (
-      model &&
-      !/wv/i.test(model) &&
-      !/Mobile/i.test(model)
-    ) {
-
-      return model;
-
-    }
-
-  }
-
-
-  /*
-   * Samsung-specific fallback.
-   */
-
-  if (
-    /SM-G960/i.test(ua)
-  ) {
-
-    return "Samsung Galaxy S9";
-
-  }
-
-
-  if (
-    /SM-G965/i.test(ua)
-  ) {
-
-    return "Samsung Galaxy S9+";
-
-  }
-
-
-  return "Android Device";
-
-}
-
-
-/* =========================================================
-   RAM
-========================================================= */
-
-function detectRAM() {
-
-  /*
-   * navigator.deviceMemory is available
-   * on many Chromium Android browsers.
-   */
-
-  if (
-    navigator.deviceMemory
-  ) {
-
-    return Number(
-      navigator.deviceMemory
+  name =
+    name.replace(
+      /\)\s*$/,
+      ""
     );
 
-  }
+
+  /*
+   * Qualcomm prefixes
+   */
+
+  name =
+    name.replace(
+      /qualcomm[^a-z0-9]*/i,
+      ""
+    );
 
 
-  return null;
+  /*
+   * Google/ANGLE suffixes are not useful
+   * for the compatibility comparison.
+   */
+
+  name =
+    name.replace(
+      /\s+OpenGL ES.*$/i,
+      ""
+    );
+
+
+  return name ||
+    "Unknown GPU";
 
 }
 
@@ -320,7 +483,7 @@ function detectDevice() {
       detectAndroidVersion(),
 
     userAgent:
-      navigator.userAgent
+      navigator.userAgent || ""
 
   };
 
@@ -328,19 +491,83 @@ function detectDevice() {
 
 
 /* =========================================================
-   GPU NORMALIZATION
+   NORMALIZE GPU
 ========================================================= */
 
 function normalizeGPUName(
   gpu = ""
 ) {
 
-  return gpu
+  return String(gpu)
     .toLowerCase()
     .replace(/\(tm\)/g, "")
     .replace(/\(r\)/g, "")
+    .replace(/graphics/g, "")
+    .replace(/gpu/g, "")
     .replace(/\s+/g, " ")
     .trim();
+
+}
+
+
+/* =========================================================
+   GPU FAMILY
+========================================================= */
+
+function getGPUFamily(
+  gpu = ""
+) {
+
+  const name =
+    normalizeGPUName(gpu);
+
+
+  if (
+    name.includes("adreno")
+  ) {
+
+    return "adreno";
+
+  }
+
+
+  if (
+    name.includes("mali")
+  ) {
+
+    return "mali";
+
+  }
+
+
+  if (
+    name.includes("powervr")
+  ) {
+
+    return "powervr";
+
+  }
+
+
+  if (
+    name.includes("apple")
+  ) {
+
+    return "apple";
+
+  }
+
+
+  if (
+    name.includes("xclipse")
+  ) {
+
+    return "xclipse";
+
+  }
+
+
+  return "unknown";
 
 }
 
@@ -360,7 +587,9 @@ function getGPUScore(
 
 
   /*
-   * Adreno
+   * ADRENO
+   *
+   * Approximate generation score.
    */
 
   const adreno =
@@ -376,75 +605,101 @@ function getGPUScore(
         adreno[1]
       );
 
+
     const scores = {
 
       205: 1,
       220: 2,
       225: 2,
+
       302: 3,
       305: 3,
       306: 3,
       308: 3,
+
       320: 4,
       330: 5,
+
       405: 5,
       418: 6,
       420: 6,
       430: 7,
+
       505: 7,
       506: 7,
       508: 7,
       509: 7,
+
       512: 8,
       530: 8,
       540: 9,
+
       610: 9,
       612: 9,
+      615: 9,
       616: 9,
       618: 9,
       620: 10,
-      630: 10,
-      640: 11,
-      650: 11,
-      660: 12,
-      662: 12,
-      680: 13,
-      685: 14,
-      690: 14,
-      695: 14,
-      710: 15,
-      720: 16,
-      725: 16,
-      730: 17,
-      740: 18,
-      750: 18,
-      755: 19,
-      765: 19,
-      730: 17,
-      740: 18,
-      750: 18,
-      830: 20,
-      840: 21,
-      850: 22,
-      860: 23,
-      865: 24,
-      870: 25,
-      650: 11
+
+      630: 11,
+      640: 12,
+
+      650: 12,
+      660: 13,
+      662: 13,
+
+      680: 14,
+      685: 15,
+      690: 15,
+      695: 15,
+
+      710: 16,
+      720: 17,
+      725: 17,
+      730: 18,
+      732: 18,
+      740: 19,
+      750: 19,
+      755: 20,
+
+      760: 20,
+      765: 20,
+      768: 20,
+
+      810: 21,
+      820: 22,
+      830: 22,
+      835: 23,
+      840: 23,
+      845: 23,
+      850: 24,
+      855: 25,
+      860: 25,
+      865: 26,
+      870: 27,
+      8gen1: 28
+
     };
 
 
-    return (
-      scores[number] ||
-      estimateAdrenoScore(
-        number
-      )
+    if (
+      scores[number] !== undefined
+    ) {
+
+      return scores[number];
+
+    }
+
+
+    return estimateAdrenoScore(
+      number
     );
 
   }
 
 
   /*
-   * Mali
+   * MALI
    */
 
   if (
@@ -452,36 +707,112 @@ function getGPUScore(
   ) {
 
     if (
-      /g720|g715|g710/i.test(name)
-    ) return 18;
+      /g720|g715/i.test(name)
+    ) {
+
+      return 21;
+
+    }
+
+
+    if (
+      /g710/i.test(name)
+    ) {
+
+      return 20;
+
+    }
+
 
     if (
       /g78/i.test(name)
-    ) return 15;
+    ) {
+
+      return 17;
+
+    }
+
 
     if (
       /g77/i.test(name)
-    ) return 14;
+    ) {
+
+      return 16;
+
+    }
+
 
     if (
       /g76/i.test(name)
-    ) return 12;
+    ) {
+
+      return 14;
+
+    }
+
 
     if (
       /g57/i.test(name)
-    ) return 10;
+    ) {
+
+      return 11;
+
+    }
+
 
     if (
       /g52/i.test(name)
-    ) return 8;
+    ) {
+
+      return 9;
+
+    }
+
 
     if (
       /g51/i.test(name)
-    ) return 7;
+    ) {
+
+      return 8;
+
+    }
+
+
+    if (
+      /g72/i.test(name)
+    ) {
+
+      return 7;
+
+    }
+
+
+    if (
+      /g71/i.test(name)
+    ) {
+
+      return 7;
+
+    }
+
 
     if (
       /t880/i.test(name)
-    ) return 6;
+    ) {
+
+      return 6;
+
+    }
+
+
+    if (
+      /t760/i.test(name)
+    ) {
+
+      return 7;
+
+    }
+
 
     return 5;
 
@@ -502,26 +833,51 @@ function getGPUScore(
 
 
   /*
-   * Apple GPU
+   * Apple
    */
 
   if (
     name.includes("apple")
   ) {
 
-    return 20;
+    return 22;
 
   }
 
 
   /*
-   * Unknown GPU
+   * Xclipse
    */
+
+  if (
+    name.includes("xclipse")
+  ) {
+
+    if (
+      /940/i.test(name)
+    ) return 22;
+
+    if (
+      /920/i.test(name)
+    ) return 20;
+
+    if (
+      /730/i.test(name)
+    ) return 17;
+
+    return 15;
+
+  }
+
 
   return null;
 
 }
 
+
+/* =========================================================
+   ADRENO ESTIMATION
+========================================================= */
 
 function estimateAdrenoScore(
   number
@@ -529,7 +885,7 @@ function estimateAdrenoScore(
 
   if (
     number >= 800
-  ) return 20;
+  ) return 28;
 
   if (
     number >= 700
@@ -537,7 +893,7 @@ function estimateAdrenoScore(
 
   if (
     number >= 600
-  ) return 10;
+  ) return 9;
 
   if (
     number >= 500
@@ -557,7 +913,7 @@ function estimateAdrenoScore(
 
 
 /* =========================================================
-   GPU REQUIREMENT SCORE
+   REQUIRED GPU SCORE
 ========================================================= */
 
 function getRequiredGPUScore(
@@ -568,19 +924,14 @@ function getRequiredGPUScore(
     return null;
 
 
-  /*
-   * A game can say:
-   *
-   * Adreno 630
-   * Adreno 6xx
-   * Mali-G76
-   * Adreno 630 or equivalent
-   */
-
   const text =
-    requirement
+    String(requirement)
       .toLowerCase();
 
+
+  /*
+   * Adreno
+   */
 
   const adreno =
     text.match(
@@ -597,6 +948,10 @@ function getRequiredGPUScore(
   }
 
 
+  /*
+   * Mali
+   */
+
   const mali =
     text.match(
       /mali[^a-z0-9]*(g\d{2,3}|t\d{3,4})/i
@@ -608,6 +963,32 @@ function getRequiredGPUScore(
     return getGPUScore(
       `Mali ${mali[1]}`
     );
+
+  }
+
+
+  /*
+   * PowerVR
+   */
+
+  if (
+    /powervr/i.test(text)
+  ) {
+
+    return 7;
+
+  }
+
+
+  /*
+   * Apple
+   */
+
+  if (
+    /apple/i.test(text)
+  ) {
+
+    return 20;
 
   }
 
@@ -631,11 +1012,48 @@ function compareGPU(
   ) {
 
     return {
-      status: "unknown",
-      message: "No GPU requirement specified."
+
+      status:
+        "unknown",
+
+      message:
+        "No GPU requirement specified."
+
     };
 
   }
+
+
+  if (
+    !deviceGPU ||
+    /unknown/i.test(
+      deviceGPU
+    )
+  ) {
+
+    return {
+
+      status:
+        "unknown",
+
+      message:
+        "GPU could not be detected."
+
+    };
+
+  }
+
+
+  const deviceFamily =
+    getGPUFamily(
+      deviceGPU
+    );
+
+
+  const requiredFamily =
+    getGPUFamily(
+      requiredGPU
+    );
 
 
   const deviceScore =
@@ -650,75 +1068,157 @@ function compareGPU(
     );
 
 
+  /*
+   * Exact / same-family comparison.
+   */
+
   if (
-    deviceScore === null ||
-    requiredScore === null
+    deviceScore !== null &&
+    requiredScore !== null &&
+    deviceFamily === requiredFamily
   ) {
 
-    /*
-     * Direct text match fallback.
-     */
-
-    const device =
-      normalizeGPUName(
-        deviceGPU
-      );
-
-    const required =
-      normalizeGPUName(
-        requiredGPU
-      );
-
-
     if (
-      device.includes(
-        required
-      ) ||
-      required.includes(
-        device
-      )
+      deviceScore >=
+      requiredScore
     ) {
 
       return {
-        status: "pass",
-        message: "GPU appears compatible."
+
+        status:
+          "pass",
+
+        message:
+          "GPU meets or exceeds the requirement."
+
       };
 
     }
 
 
     return {
-      status: "unknown",
+
+      status:
+        "fail",
+
       message:
-        "GPU could not be compared automatically."
+        "GPU is below the required level."
+
     };
 
   }
 
 
+  /*
+   * Cross-vendor GPU comparison.
+   *
+   * This is approximate, so don't call it
+   * a guaranteed pass.
+   */
+
   if (
-    deviceScore >=
-    requiredScore
+    deviceScore !== null &&
+    requiredScore !== null
+  ) {
+
+    if (
+      deviceScore >=
+      requiredScore + 2
+    ) {
+
+      return {
+
+        status:
+          "pass",
+
+        message:
+          "GPU performance appears sufficient."
+
+      };
+
+    }
+
+
+    if (
+      deviceScore >=
+      requiredScore
+    ) {
+
+      return {
+
+        status:
+          "warning",
+
+        message:
+          "GPU appears close to the requirement."
+
+      };
+
+    }
+
+
+    return {
+
+      status:
+        "fail",
+
+      message:
+        "GPU performance appears below the requirement."
+
+    };
+
+  }
+
+
+  /*
+   * Text fallback.
+   */
+
+  const device =
+    normalizeGPUName(
+      deviceGPU
+    );
+
+
+  const required =
+    normalizeGPUName(
+      requiredGPU
+    );
+
+
+  if (
+    device.includes(required) ||
+    required.includes(device)
   ) {
 
     return {
-      status: "pass",
-      message: "GPU meets the requirement."
+
+      status:
+        "pass",
+
+      message:
+        "GPU appears compatible."
+
     };
 
   }
 
 
   return {
-    status: "fail",
-    message: "GPU is below the recommended level."
+
+    status:
+      "unknown",
+
+    message:
+      "GPU could not be compared automatically."
+
   };
 
 }
 
 
 /* =========================================================
-   ANDROID VERSION COMPARISON
+   ANDROID VERSION
 ========================================================= */
 
 function parseAndroidVersion(
@@ -730,9 +1230,10 @@ function parseAndroidVersion(
 
 
   const match =
-    String(value).match(
-      /(\d+(?:\.\d+)?)/
-    );
+    String(value)
+      .match(
+        /(\d+(?:\.\d+)?)/
+      );
 
 
   return match
@@ -752,8 +1253,13 @@ function compareAndroid(
   ) {
 
     return {
-      status: "unknown",
-      message: "No Android requirement."
+
+      status:
+        "unknown",
+
+      message:
+        "No Android requirement specified."
+
     };
 
   }
@@ -777,8 +1283,13 @@ function compareAndroid(
   ) {
 
     return {
-      status: "unknown",
-      message: "Android version could not be compared."
+
+      status:
+        "unknown",
+
+      message:
+        "Android version could not be compared."
+
     };
 
   }
@@ -789,23 +1300,33 @@ function compareAndroid(
   ) {
 
     return {
-      status: "pass",
-      message: "Android version is sufficient."
+
+      status:
+        "pass",
+
+      message:
+        "Android version is sufficient."
+
     };
 
   }
 
 
   return {
-    status: "fail",
-    message: "Android version is too old."
+
+    status:
+      "fail",
+
+    message:
+      "Android version is too old."
+
   };
 
 }
 
 
 /* =========================================================
-   RAM COMPARISON
+   RAM
 ========================================================= */
 
 function compareRAM(
@@ -814,12 +1335,18 @@ function compareRAM(
 ) {
 
   if (
-    !game.minRam
+    !game.minRam &&
+    !game.recommendedRam
   ) {
 
     return {
-      status: "unknown",
-      message: "No minimum RAM specified."
+
+      status:
+        "unknown",
+
+      message:
+        "No RAM requirement specified."
+
     };
 
   }
@@ -830,22 +1357,41 @@ function compareRAM(
   ) {
 
     return {
-      status: "unknown",
-      message: "RAM could not be detected."
+
+      status:
+        "unknown",
+
+      message:
+        "RAM could not be detected."
+
     };
 
   }
 
 
+  const minimum =
+    game.minRam ||
+    game.recommendedRam;
+
+
+  const recommended =
+    game.recommendedRam ||
+    minimum;
+
+
   if (
     deviceRAM >=
-    game.recommendedRam
+    recommended
   ) {
 
     return {
-      status: "pass",
+
+      status:
+        "pass",
+
       message:
         `${deviceRAM} GB RAM meets the recommended requirement.`
+
     };
 
   }
@@ -853,22 +1399,125 @@ function compareRAM(
 
   if (
     deviceRAM >=
-    game.minRam
+    minimum
   ) {
 
     return {
-      status: "warning",
+
+      status:
+        "warning",
+
       message:
         `${deviceRAM} GB RAM meets the minimum requirement.`
+
     };
 
   }
 
 
   return {
-    status: "fail",
+
+    status:
+      "fail",
+
     message:
       `${deviceRAM} GB RAM is below the minimum requirement.`
+
+  };
+
+}
+
+
+/* =========================================================
+   VULKAN
+========================================================= */
+
+function detectVulkanSupport() {
+
+  try {
+
+    const canvas =
+      document.createElement(
+        "canvas"
+      );
+
+
+    const gl =
+      canvas.getContext(
+        "webgl2"
+      );
+
+
+    /*
+     * WebGL2 does NOT prove Android Vulkan
+     * support, so don't claim it does.
+     *
+     * This function intentionally returns
+     * unknown unless the browser exposes
+     * a useful signal.
+     */
+
+    if (!gl) {
+
+      return null;
+
+    }
+
+
+    return null;
+
+  }
+
+  catch {
+
+    return null;
+
+  }
+
+}
+
+
+/* =========================================================
+   VULKAN COMPARISON
+========================================================= */
+
+function compareVulkan(
+  device,
+  game
+) {
+
+  if (
+    !game.vulkanRequired
+  ) {
+
+    return {
+
+      status:
+        "pass",
+
+      message:
+        "Vulkan is not required."
+
+    };
+
+  }
+
+
+  /*
+   * Browser JavaScript cannot reliably determine
+   * Android Vulkan support.
+   *
+   * Therefore we do not pretend to know.
+   */
+
+  return {
+
+    status:
+      "unknown",
+
+    message:
+      "Vulkan is required. Verify that your device supports Vulkan."
+
   };
 
 }
@@ -879,112 +1528,195 @@ function compareRAM(
 ========================================================= */
 
 function calculateResult(
-  ramResult,
-  gpuResult,
-  androidResult
+  results
 ) {
-
-  const results = [
-    ramResult,
-    gpuResult,
-    androidResult
-  ];
-
 
   const failures =
     results.filter(
-      result =>
-        result.status === "fail"
+      item =>
+        item.status === "fail"
     ).length;
 
 
   const warnings =
     results.filter(
-      result =>
-        result.status === "warning"
+      item =>
+        item.status === "warning"
+    ).length;
+
+
+  const unknowns =
+    results.filter(
+      item =>
+        item.status === "unknown"
     ).length;
 
 
   const passes =
     results.filter(
-      result =>
-        result.status === "pass"
+      item =>
+        item.status === "pass"
     ).length;
 
+
+  /*
+   * Two or more hard failures.
+   */
 
   if (
     failures >= 2
   ) {
 
     return {
-      type: "bad",
-      icon: "✕",
-      title: "Not Recommended",
+
+      type:
+        "bad",
+
+      icon:
+        "✕",
+
+      title:
+        "Not Recommended",
+
       message:
-        "Your device does not meet several important requirements for this game."
+        "Your device falls below several important requirements for this game."
+
     };
 
   }
 
+
+  /*
+   * One hard failure.
+   */
 
   if (
     failures === 1
   ) {
 
     return {
-      type: "warning",
-      icon: "!",
-      title: "May Not Run Well",
+
+      type:
+        "warning",
+
+      icon:
+        "!",
+
+      title:
+        "May Struggle",
+
       message:
         "Your device falls below at least one important requirement."
+
     };
 
   }
 
 
+  /*
+   * No failures, but warnings.
+   */
+
   if (
-    warnings >= 1
+    warnings > 0
   ) {
 
     return {
-      type: "playable",
-      icon: "✓",
-      title: "Playable",
+
+      type:
+        "playable",
+
+      icon:
+        "✓",
+
+      title:
+        "Playable",
+
       message:
-        "Your device meets the minimum requirements, but lower settings may be needed."
+        "Your device appears capable of running this game, but some settings or performance limitations may apply."
+
     };
 
   }
 
 
+  /*
+   * Everything known passes.
+   */
+
   if (
-    passes >= 1
+    passes > 0 &&
+    unknowns === 0
   ) {
 
     return {
-      type: "good",
-      icon: "✓",
-      title: "Should Run",
+
+      type:
+        "good",
+
+      icon:
+        "✓",
+
+      title:
+        "Should Run",
+
       message:
-        "Your device appears to meet the requirements for this game."
+        "Your device appears to meet the known requirements for this game."
+
+    };
+
+  }
+
+
+  /*
+   * Some requirements cannot be verified.
+   */
+
+  if (
+    passes > 0 &&
+    unknowns > 0
+  ) {
+
+    return {
+
+      type:
+        "playable",
+
+      icon:
+        "✓",
+
+      title:
+        "Likely Playable",
+
+      message:
+        "Your device meets the requirements we could verify, but some information could not be detected automatically."
+
     };
 
   }
 
 
   return {
-    type: "playable",
-    icon: "?",
-    title: "Unable to Determine",
+
+    type:
+      "playable",
+
+    icon:
+      "?",
+
+    title:
+      "Unable to Determine",
+
     message:
-      "There is not enough information to make a reliable compatibility decision."
+      "There is not enough reliable information to make a compatibility decision."
+
   };
 
 }
 
 
 /* =========================================================
-   RENDER DEVICE
+   DEVICE CARD
 ========================================================= */
 
 function renderDeviceCard(
@@ -1002,41 +1734,70 @@ function renderDeviceCard(
       <div class="device-grid">
 
         <div class="device-item">
-          <span>Device</span>
+
+          <span>
+            Device
+          </span>
+
           <strong>
             ${escapeHTML(
               device.name
             )}
           </strong>
+
         </div>
 
+
         <div class="device-item">
-          <span>RAM</span>
+
+          <span>
+            RAM
+          </span>
+
           <strong>
+
             ${
               device.ram !== null
                 ? `${device.ram} GB`
                 : "Not detected"
             }
+
           </strong>
+
         </div>
 
+
         <div class="device-item">
-          <span>GPU</span>
+
+          <span>
+            GPU
+          </span>
+
           <strong>
+
             ${escapeHTML(
               device.gpu
             )}
+
           </strong>
+
         </div>
 
+
         <div class="device-item">
-          <span>Android</span>
+
+          <span>
+            Android
+          </span>
+
           <strong>
+
             ${escapeHTML(
               device.android
             )}
+
           </strong>
+
         </div>
 
       </div>
@@ -1049,7 +1810,7 @@ function renderDeviceCard(
 
 
 /* =========================================================
-   RENDER REQUIREMENTS
+   GAME REQUIREMENTS
 ========================================================= */
 
 function renderRequirements(
@@ -1066,82 +1827,128 @@ function renderRequirements(
         )}
       </h2>
 
+
       <div class="comparison-list">
 
         <div class="comparison-row">
-          <span>Platform</span>
+
+          <span>
+            Platform
+          </span>
+
           <strong>
             ${escapeHTML(
               game.platform
             )}
           </strong>
+
         </div>
+
 
         ${
           game.minRam
             ? `
+
               <div class="comparison-row">
-                <span>Minimum RAM</span>
+
+                <span>
+                  Minimum RAM
+                </span>
+
                 <strong>
                   ${game.minRam} GB
                 </strong>
+
               </div>
+
             `
             : ""
         }
+
 
         ${
           game.recommendedRam
             ? `
+
               <div class="comparison-row">
-                <span>Recommended RAM</span>
+
+                <span>
+                  Recommended RAM
+                </span>
+
                 <strong>
                   ${game.recommendedRam} GB
                 </strong>
+
               </div>
+
             `
             : ""
         }
 
+
         ${
           game.gpu
             ? `
+
               <div class="comparison-row">
-                <span>GPU</span>
+
+                <span>
+                  GPU
+                </span>
+
                 <strong>
                   ${escapeHTML(
                     game.gpu
                   )}
                 </strong>
+
               </div>
+
             `
             : ""
         }
 
+
         ${
           game.android
             ? `
+
               <div class="comparison-row">
-                <span>Android</span>
+
+                <span>
+                  Android
+                </span>
+
                 <strong>
                   ${escapeHTML(
                     game.android
                   )}
                 </strong>
+
               </div>
+
             `
             : ""
         }
 
+
         <div class="comparison-row">
-          <span>Vulkan</span>
+
+          <span>
+            Vulkan
+          </span>
+
           <strong>
+
             ${
-              game.vulkan
+              game.vulkanRequired
                 ? "Required"
                 : "Not required"
             }
+
           </strong>
+
         </div>
 
       </div>
@@ -1154,7 +1961,32 @@ function renderRequirements(
 
 
 /* =========================================================
-   RENDER COMPARISON
+   STATUS ICON
+========================================================= */
+
+function statusIcon(
+  status
+) {
+
+  if (
+    status === "pass"
+  ) return "✓";
+
+  if (
+    status === "fail"
+  ) return "✕";
+
+  if (
+    status === "warning"
+  ) return "!";
+
+  return "?";
+
+}
+
+
+/* =========================================================
+   COMPARISON
 ========================================================= */
 
 function renderComparison(
@@ -1183,11 +2015,24 @@ function renderComparison(
     );
 
 
+  const vulkan =
+    compareVulkan(
+      device,
+      game
+    );
+
+
+  const results = [
+    ram,
+    gpu,
+    android,
+    vulkan
+  ];
+
+
   const result =
     calculateResult(
-      ram,
-      gpu,
-      android
+      results
     );
 
 
@@ -1201,12 +2046,16 @@ function renderComparison(
         ${result.icon}
       </div>
 
+
       <div class="result-title">
         ${result.title}
       </div>
 
+
       <p class="result-message">
-        ${result.message}
+        ${escapeHTML(
+          result.message
+        )}
       </p>
 
     </section>
@@ -1218,87 +2067,79 @@ function renderComparison(
         Compatibility Details
       </h2>
 
+
       <div class="comparison-list">
 
-        <div class="comparison-row">
 
-          <span>
-            RAM
-          </span>
-
-          <strong
-            class="${ram.status}"
-          >
-            ${
-              ram.status === "pass"
-                ? "✓ "
-                : ram.status === "fail"
-                  ? "✕ "
-                  : ram.status === "warning"
-                    ? "! "
-                    : ""
-            }
-
-            ${escapeHTML(
-              ram.message
-            )}
-          </strong>
-
-        </div>
+        ${renderComparisonRow(
+          "RAM",
+          ram
+        )}
 
 
-        <div class="comparison-row">
-
-          <span>
-            GPU
-          </span>
-
-          <strong
-            class="${gpu.status}"
-          >
-            ${
-              gpu.status === "pass"
-                ? "✓ "
-                : gpu.status === "fail"
-                  ? "✕ "
-                  : ""
-            }
-
-            ${escapeHTML(
-              gpu.message
-            )}
-          </strong>
-
-        </div>
+        ${renderComparisonRow(
+          "GPU",
+          gpu
+        )}
 
 
-        <div class="comparison-row">
+        ${renderComparisonRow(
+          "Android",
+          android
+        )}
 
-          <span>
-            Android
-          </span>
 
-          <strong
-            class="${android.status}"
-          >
-            ${
-              android.status === "pass"
-                ? "✓ "
-                : android.status === "fail"
-                  ? "✕ "
-                  : ""
-            }
-
-            ${escapeHTML(
-              android.message
-            )}
-          </strong>
-
-        </div>
+        ${renderComparisonRow(
+          "Vulkan",
+          vulkan
+        )}
 
       </div>
 
     </section>
+
+  `;
+
+}
+
+
+/* =========================================================
+   COMPARISON ROW
+========================================================= */
+
+function renderComparisonRow(
+  label,
+  result
+) {
+
+  return `
+
+    <div class="comparison-row">
+
+      <span>
+        ${escapeHTML(
+          label
+        )}
+      </span>
+
+
+      <strong
+        class="${escapeHTML(
+          result.status
+        )}"
+      >
+
+        ${statusIcon(
+          result.status
+        )}
+
+        ${escapeHTML(
+          result.message
+        )}
+
+      </strong>
+
+    </div>
 
   `;
 
@@ -1319,14 +2160,16 @@ function renderManualFallback() {
         Manual Device Information
       </h2>
 
+
       <p>
-        Automatic detection is not available
-        for some browsers. You can enter your
-        device information manually.
+        Browser detection is not perfect.
+        If any device information is incorrect
+        or missing, enter it manually below.
       </p>
 
 
       <label>
+
         Device Name
 
         <input
@@ -1339,6 +2182,7 @@ function renderManualFallback() {
 
 
       <label>
+
         RAM (GB)
 
         <input
@@ -1353,6 +2197,7 @@ function renderManualFallback() {
 
 
       <label>
+
         GPU
 
         <input
@@ -1365,6 +2210,7 @@ function renderManualFallback() {
 
 
       <label>
+
         Android Version
 
         <input
@@ -1379,8 +2225,11 @@ function renderManualFallback() {
       <button
         class="manual-btn"
         id="manualCheck"
+        type="button"
       >
+
         Check Manually
+
       </button>
 
     </section>
@@ -1404,32 +2253,111 @@ function setupManualCheck() {
     return;
 
 
+  /*
+   * Pre-fill the form with detected values.
+   */
+
+  const deviceInput =
+    $("#manualDevice");
+
+
+  const ramInput =
+    $("#manualRam");
+
+
+  const gpuInput =
+    $("#manualGpu");
+
+
+  const androidInput =
+    $("#manualAndroid");
+
+
+  if (
+    deviceInput &&
+    detectedDevice
+  ) {
+
+    deviceInput.value =
+      detectedDevice.name !==
+      "Android Device"
+        ? detectedDevice.name
+        : "";
+
+  }
+
+
+  if (
+    ramInput &&
+    detectedDevice &&
+    detectedDevice.ram !== null
+  ) {
+
+    ramInput.value =
+      detectedDevice.ram;
+
+  }
+
+
+  if (
+    gpuInput &&
+    detectedDevice
+  ) {
+
+    gpuInput.value =
+      detectedDevice.gpu !==
+      "Unknown GPU"
+        ? detectedDevice.gpu
+        : "";
+
+  }
+
+
+  if (
+    androidInput &&
+    detectedDevice
+  ) {
+
+    androidInput.value =
+      detectedDevice.android !==
+      "Unknown"
+        ? detectedDevice.android
+        : "";
+
+  }
+
+
   button.addEventListener(
     "click",
     () => {
 
+      const ramValue =
+        Number(
+          ramInput?.value
+        );
+
+
       const device = {
 
         name:
-          $("#manualDevice")
+          deviceInput
             ?.value
             .trim() ||
           "Manual Device",
 
         ram:
-          Number(
-            $("#manualRam")
-              ?.value
-          ) || null,
+          ramValue > 0
+            ? ramValue
+            : null,
 
         gpu:
-          $("#manualGpu")
+          gpuInput
             ?.value
             .trim() ||
           "Unknown GPU",
 
         android:
-          $("#manualAndroid")
+          androidInput
             ?.value
             .trim() ||
           "Unknown"
@@ -1444,6 +2372,29 @@ function setupManualCheck() {
       renderPage(
         selectedGame,
         device
+      );
+
+
+      /*
+       * Scroll back to the result.
+       */
+
+      setTimeout(
+        () => {
+
+          const result =
+            document.querySelector(
+              ".result-card"
+            );
+
+
+          result?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+        },
+        50
       );
 
     }
@@ -1465,6 +2416,10 @@ function renderPage(
     $("#compatibilityContent");
 
 
+  if (!content)
+    return;
+
+
   content.classList.remove(
     "loading"
   );
@@ -1478,18 +2433,22 @@ function renderPage(
         GAMING HOOD
       </p>
 
+
       <h1>
         Compatibility Checker
       </h1>
 
+
       <p>
         Checking whether your Android
         device can run
+
         <strong>
           ${escapeHTML(
             game.title
           )}
         </strong>.
+
       </p>
 
     </div>
@@ -1520,7 +2479,9 @@ function renderPage(
         game.id
       )}"
     >
+
       ← Back to Game
+
     </a>
 
   `;
@@ -1612,7 +2573,8 @@ async function init() {
     selectedGame =
       games.find(
         game =>
-          game.id === gameId
+          String(game.id) ===
+          String(gameId)
       );
 
 
@@ -1648,9 +2610,17 @@ async function init() {
     }
 
 
+    /*
+     * Detect device.
+     */
+
     detectedDevice =
       detectDevice();
 
+
+    /*
+     * Render.
+     */
 
     renderPage(
       selectedGame,
@@ -1696,5 +2666,9 @@ async function init() {
 
 }
 
+
+/* =========================================================
+   START
+========================================================= */
 
 init();
