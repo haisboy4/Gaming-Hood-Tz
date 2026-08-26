@@ -7,7 +7,7 @@ const APP_SHELL = [
   "./css/game.css",
   "./js/app.js",
   "./js/game-page.js",
-  "./data/games.json",
+  "./games.json",
   "./manifest.json",
   "./game.html"
 ];
