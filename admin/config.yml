@@ -3,9 +3,12 @@ backend:
   repo: haisboy4/Gaming-Hood-Tz
   branch: main
 
-  # GitHub Pages site
-  site_domain: haisboy4.github.io/Gaming-Hood-Tz
+  # Your Cloudflare OAuth Worker
+  base_url: https://gaming-hood-cms-auth.haisboy4.workers.dev
+  auth_endpoint: auth
 
+  # Your actual GitHub Pages site
+  site_domain: haisboy4.github.io/Gaming-Hood-Tz
   # Cloudflare OAuth Worker
   base_url: https://gaming-hood-cms-auth.haisboy4.workers.dev
   auth_endpoint: auth
