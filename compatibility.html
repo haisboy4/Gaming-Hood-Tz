@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#170d25"
+  >
+
+  <title>Compatibility Checker — Gaming Hood</title>
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
+  <style>
+
+    .compatibility-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    .compatibility-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .compatibility-header h1 {
+      margin-bottom: 8px;
+    }
+
+    .compatibility-header p {
+      color: #777;
+      line-height: 1.6;
+    }
+
+    .device-card,
+    .game-requirement-card,
+    .result-card,
+    .manual-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(20, 10, 30, .07);
+    }
+
+    .device-card h2,
+    .game-requirement-card h2,
+    .manual-card h2 {
+      margin-top: 0;
+    }
+
+    .device-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #eee;
+    }
+
+    .device-item {
+      background: #fff;
+      padding: 13px;
+    }
+
+    .device-item span {
+      display: block;
+      color: #777;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .device-item strong {
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .result-card {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .result-icon {
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .result-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 5px 0 10px;
+    }
+
+    .result-message {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .result-good {
+      border: 2px solid #3aaa65;
+    }
+
+    .result-playable {
+      border: 2px solid #8b5cf6;
+    }
+
+    .result-warning {
+      border: 2px solid #e09b24;
+    }
+
+    .result-bad {
+      border: 2px solid #dc4c4c;
+    }
+
+    .comparison-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .comparison-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 13px;
+      background: #f7f5f8;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .comparison-row span {
+      color: #666;
+    }
+
+    .comparison-row strong {
+      text-align: right;
+    }
+
+    .pass {
+      color: #218c4b;
+    }
+
+    .fail {
+      color: #c83333;
+    }
+
+    .unknown {
+      color: #777;
+    }
+
+    .manual-card input,
+    .manual-card select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin-top: 7px;
+      margin-bottom: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      font: inherit;
+    }
+
+    .manual-card label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .manual-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px;
+      background: #8d3fc2;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: #170d25;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    @media (max-width: 520px) {
+
+      .device-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .comparison-row strong {
+        text-align: left;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a
+      class="brand"
+      href="./"
+      aria-label="Gaming Hood home"
+    >
+
+      <div class="brand-mark">
+        GH
+      </div>
+
+      <span>
+        GAMING HOOD
+      </span>
+
+    </a>
+
+  </header>
+
+
+  <main class="compatibility-page">
+
+    <div
+      id="compatibilityContent"
+      class="loading"
+    >
+      Detecting your device...
+    </div>
+
+  </main>
+
+
+  <script src="js/compatibility.js"></script>
+
+</body>
+</html>
