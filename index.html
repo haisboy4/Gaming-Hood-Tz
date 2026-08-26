@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#170d25">
-  <meta name="description" content="Gaming Hood — games, emulators, compatibility and gaming resources.">
+  <meta name="theme-color" content="#160b23">
+  <meta name="description" content="Gaming Hood — games, emulators and gaming resources.">
   <title>Gaming Hood</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json">
@@ -16,12 +16,12 @@
     </button>
 
     <a class="brand" href="./" aria-label="Gaming Hood home">
-      <div class="brand-mark">GH</div>
-      <span>GAMING HOOD</span>
+      <span class="brand-mark">GH</span>
+      <span class="brand-name">GAMING HOOD</span>
     </a>
 
     <div class="header-actions">
-      <button class="icon-btn" id="randomBtn" aria-label="Random game" title="Random game">⚄</button>
+      <button class="icon-btn" id="randomBtn" aria-label="Random game" title="Random game">✦</button>
       <button class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
     </div>
   </header>
@@ -29,69 +29,81 @@
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawer-top">
-      <strong>Gaming Hood</strong>
+      <a class="drawer-brand" href="./">
+        <span class="brand-mark">GH</span>
+        <span>Gaming Hood</span>
+      </a>
       <button class="close-btn" id="closeDrawer" aria-label="Close menu">×</button>
     </div>
 
     <form class="drawer-search" id="drawerSearchForm">
       <input id="drawerSearchInput" type="search" placeholder="Search games..." autocomplete="off">
-      <button type="submit">⌕</button>
+      <button type="submit" aria-label="Search">⌕</button>
     </form>
 
     <nav class="drawer-nav">
-      <a href="./">Home</a>
+      <a href="./">Home <span>›</span></a>
 
       <button class="nav-drop" data-target="categoriesMenu">
-        Categories <span>⌄</span>
+        <span>Categories</span><span>⌄</span>
       </button>
       <div class="subnav" id="categoriesMenu">
-        <a href="category.html?platform=Android">Android</a>
-        <a href="category.html?platform=PC">PC</a>
-        <a href="category.html?platform=Winlator">Winlator</a>
-        <a href="category.html?platform=PSP">PSP</a>
-        <a href="category.html?platform=PS%20Vita">PS Vita</a>
-        <a href="category.html?platform=PS2">PS2</a>
-        <a href="category.html?platform=Wii">Wii</a>
+        <a href="./?platform=Android#games">Android <span>›</span></a>
+        <a href="./?platform=PC#games">PC <span>›</span></a>
+        <a href="./?platform=Winlator#games">Winlator <span>›</span></a>
+        <a href="./?platform=PSP#games">PSP <span>›</span></a>
+        <a href="./?platform=PS%20Vita#games">PS Vita <span>›</span></a>
+        <a href="./?platform=PS2#games">PS2 <span>›</span></a>
+        <a href="./?platform=Wii#games">Wii <span>›</span></a>
+        <a href="./?platform=GameCube#games">GameCube <span>›</span></a>
       </div>
 
-      <a href="#top-games">Top Games</a>
-      <a href="#recent-updates">Recent Updates</a>
+      <a href="./?sort=top#games">Top Games <span>›</span></a>
+      <a href="./?sort=recent#games">Recent Updates <span>›</span></a>
 
       <button class="nav-drop" data-target="gamesListMenu">
-        Games List <span>⌄</span>
+        <span>Games List</span><span>⌄</span>
       </button>
       <div class="subnav" id="gamesListMenu">
-        <a href="#games">All Games</a>
-        <a href="category.html?sort=az">A–Z</a>
-        <a href="category.html?sort=za">Z–A</a>
+        <a href="./#games">All Games <span>›</span></a>
+        <a href="./?sort=az#games">A–Z <span>›</span></a>
+        <a href="./?sort=za#games">Z–A <span>›</span></a>
       </div>
 
-      <a href="compatibility.html">Compatibility Checker</a>
-      <a href="#emulators">Emulators</a>
+      <a class="request-link" href="https://chat.whatsapp.com/DT0M0LjGN8d67FzKWC9S7Q?s=cl&p=a&ilr=1" target="_blank" rel="noopener noreferrer">
+        <span>Request a Game</span><span>↗</span>
+      </a>
 
-      <button class="nav-drop" data-target="faqMenu">
-        FAQ <span>⌄</span>
-      </button>
-      <div class="subnav" id="faqMenu">
-        <a href="faq.html">Common Questions</a>
-        <a href="faq.html#installation">Installation</a>
-        <a href="faq.html#compatibility">Compatibility</a>
-      </div>
-
-      <a href="#request">Request a Game</a>
-      <a href="#about">About Gaming Hood</a>
-      <a href="admin/">Admin</a>
+      <a href="#about">About Gaming Hood <span>›</span></a>
+      <a class="admin-link" href="admin/">Admin <span>↗</span></a>
     </nav>
+
+    <div class="drawer-note">
+      <strong>Gaming Hood</strong>
+      <span>Find games. Check details. Download.</span>
+    </div>
   </aside>
 
   <section class="hero">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
     <div class="hero-inner">
-      <p class="eyebrow">YOUR GAMING HUB</p>
-      <h1>Find your next game.</h1>
-      <p class="hero-text">Games, emulators, compatibility information and useful guides — organized in one place.</p>
-      <div class="hero-search">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR GAMING HUB</p>
+        <h1>Find your next <em>game.</em></h1>
+        <p class="hero-text">Games, emulators and useful gaming resources — organized in one place.</p>
+      </div>
+
+      <form class="hero-search" id="heroSearchForm">
+        <span class="search-icon">⌕</span>
         <input id="heroSearchInput" type="search" placeholder="Search games, platforms, emulators..." autocomplete="off">
-        <button id="heroSearchBtn">Search</button>
+        <button id="heroSearchBtn" type="submit">Search</button>
+      </form>
+
+      <div class="hero-stats" aria-label="Gaming Hood features">
+        <span><b>01</b> Browse</span>
+        <span><b>02</b> Discover</span>
+        <span><b>03</b> Download</span>
       </div>
     </div>
   </section>
@@ -103,7 +115,7 @@
           <p class="section-kicker">LATEST</p>
           <h2>Recently Added</h2>
         </div>
-        <a href="category.html?sort=recent">View all</a>
+        <a class="view-link" href="./?sort=recent#games">View all <span>→</span></a>
       </div>
       <div class="game-grid" id="recentGrid"></div>
     </section>
@@ -114,7 +126,7 @@
           <p class="section-kicker">POPULAR</p>
           <h2>Top Games</h2>
         </div>
-        <a href="category.html?sort=top">View all</a>
+        <a class="view-link" href="./?sort=top#games">View all <span>→</span></a>
       </div>
       <div class="game-grid" id="topGrid"></div>
     </section>
@@ -123,63 +135,65 @@
       <div class="section-heading">
         <div>
           <p class="section-kicker">EXPLORE</p>
-          <h2>Categories</h2>
+          <h2>Browse by platform</h2>
         </div>
       </div>
       <div class="category-grid">
-        <a href="category.html?platform=Android">Android</a>
-        <a href="category.html?platform=PC">PC</a>
-        <a href="category.html?platform=Winlator">Winlator</a>
-        <a href="category.html?platform=PSP">PSP</a>
-        <a href="category.html?platform=PS%20Vita">PS Vita</a>
-        <a href="category.html?platform=PS2">PS2</a>
-        <a href="category.html?platform=Wii">Wii</a>
-        <a href="category.html?platform=GameCube">GameCube</a>
+        <a href="./?platform=Android#games"><span class="cat-icon">A</span><span>Android</span><b>→</b></a>
+        <a href="./?platform=PC#games"><span class="cat-icon">PC</span><span>PC</span><b>→</b></a>
+        <a href="./?platform=Winlator#games"><span class="cat-icon">W</span><span>Winlator</span><b>→</b></a>
+        <a href="./?platform=PSP#games"><span class="cat-icon">P</span><span>PSP</span><b>→</b></a>
+        <a href="./?platform=PS%20Vita#games"><span class="cat-icon">V</span><span>PS Vita</span><b>→</b></a>
+        <a href="./?platform=PS2#games"><span class="cat-icon">2</span><span>PS2</span><b>→</b></a>
+        <a href="./?platform=Wii#games"><span class="cat-icon">W</span><span>Wii</span><b>→</b></a>
+        <a href="./?platform=GameCube#games"><span class="cat-icon">G</span><span>GameCube</span><b>→</b></a>
       </div>
-    </section>
-
-    <section class="section feature-strip">
-      <div>
-        <p class="section-kicker">CHECK BEFORE YOU DOWNLOAD</p>
-        <h2>Can your device run it?</h2>
-        <p>Use the Gaming Hood compatibility checker to compare a game's requirements with your Android device.</p>
-      </div>
-      <a class="primary-btn" href="compatibility.html">Check compatibility</a>
     </section>
 
     <section class="section" id="games">
-      <div class="section-heading">
-        <div>
-          <p class="section-kicker">LIBRARY</p>
-          <h2>All Games</h2>
+      <div class="library-panel">
+        <div class="section-heading library-heading">
+          <div>
+            <p class="section-kicker">LIBRARY</p>
+            <h2 id="libraryTitle">All Games</h2>
+          </div>
+          <span class="result-count" id="resultCount"></span>
         </div>
-        <span class="result-count" id="resultCount"></span>
-      </div>
 
-      <div class="inline-search">
-        <input id="librarySearchInput" type="search" placeholder="Filter the game library..." autocomplete="off">
+        <div class="library-toolbar">
+          <div class="inline-search">
+            <span>⌕</span>
+            <input id="librarySearchInput" type="search" placeholder="Filter the game library..." autocomplete="off">
+          </div>
+          <button class="clear-filter" id="clearFilterBtn" type="button" hidden>Clear filter</button>
+        </div>
+
+        <div class="game-grid" id="allGrid"></div>
+        <p class="empty-state" id="emptyState" hidden>No games matched your search.</p>
       </div>
-      <div class="game-grid" id="allGrid"></div>
-      <p class="empty-state" id="emptyState" hidden>No games matched your search.</p>
     </section>
   </main>
 
   <footer class="site-footer" id="about">
-    <div>
-      <strong>Gaming Hood</strong>
-      <p>A gaming-focused website for games, emulators, compatibility and guides.</p>
+    <div class="footer-main">
+      <div>
+        <a class="footer-brand" href="./"><span class="brand-mark">GH</span><strong>Gaming Hood</strong></a>
+        <p>A gaming-focused library for games, emulators and useful gaming resources.</p>
+      </div>
+      <div class="footer-actions">
+        <a href="./#games">Games</a>
+        <a href="./?sort=top#games">Top Games</a>
+        <a href="https://chat.whatsapp.com/DT0M0LjGN8d67FzKWC9S7Q?s=cl&p=a&ilr=1" target="_blank" rel="noopener noreferrer">Request a Game</a>
+        <a href="admin/">Admin</a>
+      </div>
     </div>
-    <div class="footer-links">
-      <a href="compatibility.html">Compatibility</a>
-      <a href="faq.html">FAQ</a>
-      <a href="#request">Request a Game</a>
-      <a href="admin/">Admin</a>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Gaming Hood</span>
+      <span>Built for gamers.</span>
     </div>
-    <p class="copyright">© <span id="year"></span> Gaming Hood</p>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
   <script src="js/app.js" defer></script>
 </body>
 </html>
