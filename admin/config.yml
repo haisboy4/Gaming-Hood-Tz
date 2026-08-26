@@ -19,7 +19,7 @@ collections:
 
     files:
 
-      - file: "/games.json"
+      - file: "games.json"
         label: "Game Database"
         name: "games"
         format: "json"
