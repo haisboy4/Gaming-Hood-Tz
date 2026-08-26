@@ -1,6 +1,16 @@
 {
   "games": [
     {
+      "views": 0,
+      "vulkan_required": false,
+      "offline": true,
+      "controller_support": false,
+      "multiplayer": false,
+      "id": "1",
+      "title": "1",
+      "platform": "Android"
+    },
+    {
       "genre": [
         "Fighting "
       ],
