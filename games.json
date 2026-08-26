@@ -7,8 +7,10 @@
       "offline": true,
       "emulator_link": "https://play.google.com/store/apps/details?id=org.ppsspp.ppsspp",
       "slug": "ufc-5",
+      "gpu": "Mali-G57",
       "controller_support": true,
       "build": "V0.1",
+      "min_ram": 1,
       "download_link": "https://www.mediafire.com/file/qfu54rchww9tvcl/UFC5PPSSPP+BY+MODXDROID.COM.zip/file?dkey=0vvpxwkt8zg&r=85",
       "vulkan_required": false,
       "platform": "PSP",
@@ -18,8 +20,11 @@
       "tags": [
         "PSP "
       ],
+      "recommended_ram": 4,
+      "id": "ufc-5",
       "image": "https://i.postimg.cc/Qd69r02D/IMG-20260214-204548-010.jpg",
-      "description": "UFC 5 PSP mod featuring updated fighters, enhanced graphics, new arenas, and improved gameplay for an upgraded MMA experience on PPSSPP."
+      "description": "UFC 5 PSP mod featuring updated fighters, enhanced graphics, new arenas, and improved gameplay for an upgraded MMA experience on PPSSPP.",
+      "android_support": "7"
     }
   ]
 }
