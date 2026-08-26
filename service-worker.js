@@ -1,14 +1,15 @@
-const CACHE_NAME = "gaming-hood-v4";
+const CACHE_NAME = "gaming-hood-v5";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./css/style.css",
+  "./css/game.css",
   "./js/app.js",
-  "./games.json",
+  "./js/game-page.js",
+  "./data/games.json",
   "./manifest.json",
-  "./game.html",
-  "./js/game-page.js"
+  "./game.html"
 ];
 
 
@@ -23,8 +24,18 @@ self.addEventListener("install", event => {
   event.waitUntil(
 
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+
+      .then(cache => {
+
+        return cache.addAll(APP_SHELL);
+
+      })
+
+      .then(() => {
+
+        return self.skipWaiting();
+
+      })
 
   );
 
@@ -42,18 +53,26 @@ self.addEventListener("activate", event => {
   event.waitUntil(
 
     caches.keys()
+
       .then(keys => {
 
         return Promise.all(
 
           keys
+
             .filter(key => key !== CACHE_NAME)
+
             .map(key => caches.delete(key))
 
         );
 
       })
-      .then(() => self.clients.claim())
+
+      .then(() => {
+
+        return self.clients.claim();
+
+      })
 
   );
 
@@ -73,21 +92,24 @@ self.addEventListener("fetch", event => {
   }
 
 
-  const url = new URL(event.request.url);
+  const url = new URL(
+    event.request.url
+  );
 
 
   /*
   |--------------------------------------------------------------------------
-  | games.json
+  | GAME DATABASE
   |
-  | ALWAYS try the network first.
-  | This means new games added through Decap CMS
-  | appear without waiting for an old cache.
+  | data/games.json is the ONLY database.
+  |
+  | Always try the network first so games
+  | published through Decap CMS appear quickly.
   |--------------------------------------------------------------------------
   */
 
   if (
-    url.pathname.endsWith("/games.json")
+    url.pathname.endsWith("/data/games.json")
   ) {
 
     event.respondWith(
@@ -133,6 +155,42 @@ self.addEventListener("fetch", event => {
     );
 
     return;
+
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | ADMIN / DECAP CMS
+  |
+  | Do NOT cache the CMS configuration or
+  | admin pages. They need to come directly
+  | from Netlify/GitHub.
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    url.pathname.includes("/admin/")
+  ) {
+
+    event.respondWith(
+
+      fetch(event.request, {
+        cache: "no-store"
+      })
+
+      .catch(() => {
+
+        return caches.match(
+          event.request
+        );
+
+      })
+
+    );
+
+    return;
+
   }
 
 
@@ -140,7 +198,8 @@ self.addEventListener("fetch", event => {
   |--------------------------------------------------------------------------
   | STATIC FILES
   |
-  | Cache first for CSS, JS, images, etc.
+  | Cache first for CSS, JavaScript,
+  | images and other static resources.
   |--------------------------------------------------------------------------
   */
 
@@ -179,6 +238,7 @@ self.addEventListener("fetch", event => {
 
 
         caches.open(CACHE_NAME)
+
           .then(cache => {
 
             cache.put(
